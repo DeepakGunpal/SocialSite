@@ -7,7 +7,8 @@ const userSchema = new mongoose.Schema({
     phone: { type: Number, required: true, trim: true },
     password: { type: String, required: true, trim: true },
     profileImage: { type: String, trim: true },
-    bio: { type: String, trim: true }
+    bio: { type: String, trim: true },
+    follower: { type: Number, default: 0, trim: true }
 
 }, { timestamps: true })
 
