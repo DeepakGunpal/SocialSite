@@ -25,7 +25,8 @@ It contains 5 APIs
 
 ```bash
 POST /register
-POST /login
+POST /login => sunandini soni
+post/follow
 GET /user/:userId/profile (Authentication required)
 PUT /user/:userId/profile (Authentication and Authorization required)
 ```

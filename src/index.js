@@ -9,7 +9,7 @@ app.use(express.json())
 // app.use(express.urlencoded({extended:true})) //not needed
 app.use(multer().any())
 
-mongoose.connect(`mongodb+srv://Swetarun:${process.env.Password}@cluster0.ebg8a.mongodb.net/socialSite`, {
+mongoose.connect(`mongodb+srv://Swetarun:${process.env.DBPassword}@cluster0.ebg8a.mongodb.net/socialSite`, {
     useNewUrlParser: true
 })
     .then(() => console.log("MongoDb is connected"))
