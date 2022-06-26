@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
-//CEO swati di
+//CEO sweta di
 const userSchema = new mongoose.Schema({
     firstName: { type: String, required: true, trim: true },
-    lastName: { type: String, required: true, trim: true },
-    userName: { type: String, required: true, unique: true, trim: true },
+    lastName: { type: String, trim: true },
+    userName: { type: String, unique: true, trim: true },
     gender: { type: String, required: true, trim: true, enum: ["Male", "Female", "LGBTQ", "Prefer not to say"] },//drop down list
     email: { type: String, required: true, unique: true, trim: true },
     phone: { type: Number, required: true, unique: true, trim: true },
