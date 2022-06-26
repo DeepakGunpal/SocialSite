@@ -28,8 +28,10 @@ const createUser = async (req, res) => {
         //suggest available userName
         let checkUserName = await userModel.findOne({ userName });
         if (checkUserName) {
-            let availableUserName = SuggestUserName(userName)
-            console.log("availableUserName", availableUserName)
+            let availableUserName = SuggestUserName(userName);
+            let checkAgain = await userModel.findOne({ userName: availableUserName });
+            if (checkAgain) availableUserName = SuggestUserName(userName);
+
             return res.status(400).send({
                 status: false,
                 message: `${userName} not available. This is available ${availableUserName}`,
