@@ -1,3 +1,4 @@
+require('dotenv').config();
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt')
 const { uploadFile } = require('../utility/aws')
@@ -65,24 +66,24 @@ const createUser = async (req, res) => {
     }
 
 }
-const loginUser = async(req,res)=>{
+const loginUser = async (req, res) => {
     try {
         let data = req.body
-         // condition to check body should not be empty
-         if(!data){
-            return res.status(400).send({status:false,message:"plz enter emailId and password"})
-         }
-         let {email,password} =data
-         if(!valid(email)){
-            return res.status(400).send({status:false,message:"email is required"})
-         }
+        // condition to check body should not be empty
+        if (!data) {
+            return res.status(400).send({ status: false, message: "plz enter emailId and password" })
+        }
+        let { email, password } = data
+        if (!valid(email)) {
+            return res.status(400).send({ status: false, message: "email is required" })
+        }
         //  email validation
         // user
 
-         if(!valid(password)){
-            return res.status(400).send({status:false,message:"password is required"})
-         }
-         password=password.trim()
+        if (!valid(password)) {
+            return res.status(400).send({ status: false, message: "password is required" })
+        }
+        password = password.trim()
         //  password Validation
 
         const emailCheck = await userModel.findOne({ email: email })
@@ -91,28 +92,28 @@ const loginUser = async(req,res)=>{
         }
 
         const dbPassword = emailCheck.password
-        
+
         const passwordMathched = await bcrypt.compare(password, dbPassword)
         if (!passwordMathched) {
             return res.status(401).send({ status: false, message: "Please provide valid credentils" })
         }
 
-        let fName =emailCheck.firstName
+        let fName = emailCheck.firstName
         let lName = emailCheck.lastName
-        let userId=emailCheck._id
-        const token =jwt.sign(
+        let userId = emailCheck._id
+        const token = jwt.sign(
             {
-                userId:userId
+                userId: userId
             },
-            "rtyrufycdtr3343##$",{expiresIn:"24hr"}
+            process.env.SecretKey, { expiresIn: "24hr" }
         );
 
-        return res.status(200).send({ message:` welcome ${fName}  ${lName}`})
+        return res.status(200).send({ message: ` welcome ${fName}  ${lName}` })
 
     } catch (error) {
-        res.status(500).send({ status: false, message: error.message }) 
+        res.status(500).send({ status: false, message: error.message })
     }
-   
+
     // credential should be present
     // verify the correct format of email and password
     // compate password with bycript
@@ -121,4 +122,4 @@ const loginUser = async(req,res)=>{
 
 }
 
-module.exports = { createUser,loginUser }
+module.exports = { createUser, loginUser }
