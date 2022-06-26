@@ -38,5 +38,7 @@ GET /user/:userId/profile (Authentication required) => swati
   isDeleted false
 PUT /user/:userId/profile (Authentication and Authorization required) => sweta di
 
-delete/user/:userId/profile (Authentication and Authorization required) => 
+delete/user/:userId/profile (Authentication and Authorization required) => Ankit
 ```
+update
+<!-- hit=following count++,follower count++ -->
