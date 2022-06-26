@@ -1,11 +1,7 @@
 const userModel = require('../models/userModel');
-<<<<<<< HEAD
-const bcrypt =require("bcryptjs")
-=======
 const bcrypt = require('bcrypt')
 const { uploadFile } = require('../utility/aws')
 const { SuggestUserName } = require('../utility/validation')
->>>>>>> fee19167102e943629973b2dcf8a83b03c9a1921
 
 const createUser = async (req, res) => {
     try {
