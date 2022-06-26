@@ -6,7 +6,6 @@ const route = require('./route/route');
 const multer = require("multer");
 
 app.use(express.json());
-// app.use(express.urlencoded({extended:true})) //not needed
 app.use(multer().any());
 
 mongoose.connect(`mongodb+srv://Swetarun:${process.env.DBPassword}@cluster0.ebg8a.mongodb.net/socialSite`, {
@@ -23,7 +22,7 @@ app.all('*', function (req, res) {
 
 app.use(function (e, req, res, next) {
     if (e.message == "Bad Request");
-        return res.status(400).send({ error: e.message });
+    return res.status(400).send({ error: e.message });
 })
 
 app.listen(process.env.PORT || 3000, function () {
