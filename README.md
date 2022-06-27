@@ -24,7 +24,7 @@ It contains 5 APIs
 ### User APIs
 
 ```bash
-POST /register and aws => deepak
+POST /register and aws => deepak //plz add location, interests, recommendedcount, school, college, workplace, status
   auto suggest available username
 POST /login and auth => sunandini soni
 validation => ankit
