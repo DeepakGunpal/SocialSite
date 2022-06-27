@@ -64,4 +64,26 @@ const createUser = async (req, res) => {
 
 }
 
-module.exports = { createUser }
+const updateUser = async (req,res) => {
+    let userId = req.params.userId
+    let data = req.body
+    let files = req.files
+
+    // if(files && files.length > 0){
+    //     const updatedImg = await uploadFile(files[0])
+    //     updateObj["profileImage"] = updatedImg
+    // }
+
+    if(data.hasOwnProperty('email')){
+        return res.status(400).send({status: false, message: "Email can't be updated"})
+    }
+    if(data.hasOwnProperty('password')){
+        return res.status(400).send({status: false, message: "Password can't be updated"})
+    }
+
+    const userUpdate = await userModel.findByIdAndUpdate(userId, data, {new : true});
+    return res.status(200).send({status: true, message: "Updated", data: userUpdate})
+
+}
+
+module.exports = { createUser, updateUser }

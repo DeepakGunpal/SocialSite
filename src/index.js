@@ -8,11 +8,11 @@ const multer = require("multer");
 app.use(express.json());
 app.use(multer().any());
 
-mongoose.connect(`mongodb+srv://Swetarun:${process.env.DBPassword}@cluster0.ebg8a.mongodb.net/socialSite`, {
+mongoose.connect(`mongodb+srv://Swetarun:lBf6gTedHw2tfPtQ@cluster0.ebg8a.mongodb.net/socialSite`, {
     useNewUrlParser: true
 })
     .then(() => console.log("MongoDb is connected"))
-    .catch(err => console.log(err))
+    .catch(err => console.log(err,".......*****......."))
 
 app.use('/', route);
 
