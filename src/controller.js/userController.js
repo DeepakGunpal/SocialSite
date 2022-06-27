@@ -1,3 +1,4 @@
+require('dotenv').config();
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt')
 const { uploadFile } = require('../utility/aws')
@@ -28,8 +29,10 @@ const createUser = async (req, res) => {
         //suggest available userName
         let checkUserName = await userModel.findOne({ userName });
         if (checkUserName) {
-            let availableUserName = SuggestUserName(userName)
-            console.log("availableUserName", availableUserName)
+            let availableUserName = SuggestUserName(userName);
+            let checkAgain = await userModel.findOne({ userName: availableUserName });
+            if (checkAgain) availableUserName = SuggestUserName(userName);
+
             return res.status(400).send({
                 status: false,
                 message: `${userName} not available. This is available ${availableUserName}`,
@@ -63,6 +66,60 @@ const createUser = async (req, res) => {
     }
 
 }
+const loginUser = async (req, res) => {
+    try {
+        let data = req.body
+        // condition to check body should not be empty
+        if (!data) {
+            return res.status(400).send({ status: false, message: "plz enter emailId and password" })
+        }
+        let { email, password } = data
+        if (!valid(email)) {
+            return res.status(400).send({ status: false, message: "email is required" })
+        }
+        //  email validation
+        // user
+        if (!valid(password)) {
+            return res.status(400).send({ status: false, message: "password is required" })
+        }
+        password = password.trim()
+        //  password Validation
+
+        const emailCheck = await userModel.findOne({ email: email })
+        if (!emailCheck) {
+            return res.status(404).send({ status: false, message: "Email not found" })
+        }
+
+        const dbPassword = emailCheck.password
+
+        const passwordMathched = await bcrypt.compare(password, dbPassword)
+        if (!passwordMathched) {
+            return res.status(401).send({ status: false, message: "Please provide valid credentils" })
+        }
+
+        let fName = emailCheck.firstName
+        let lName = emailCheck.lastName
+        let userId = emailCheck._id
+        const token = jwt.sign(
+            {
+                userId: userId
+            },
+            process.env.SecretKey, { expiresIn: "24hr" }
+        );
+
+        return res.status(200).send({ message: ` welcome ${fName}  ${lName}` })
+
+    } catch (error) {
+        res.status(500).send({ status: false, message: error.message })
+    }
+
+    // credential should be present
+    // verify the correct format of email and password
+    // compate password with bycript
+    // generate token after successful varification
+    // send token in responce
+
+}
 
 const updateUser = async (req,res) => {
     let userId = req.params.userId
@@ -86,4 +143,4 @@ const updateUser = async (req,res) => {
 
 }
 
-module.exports = { createUser, updateUser }
+module.exports = { createUser, loginUser, updateUser }

@@ -16,6 +16,10 @@ It contains 5 APIs
   profileImage: {string, mandatory}, // s3 link
   phone: {string, mandatory, unique, valid Indian mobile number},
   password: {string, mandatory, minLen 8, maxLen 15}, // encrypted password
+  location:{},
+  interest:{},//filtered post
+  dob:{},
+  status:{},
   createdAt: {timestamp},
   updatedAt: {timestamp}
 }
@@ -34,5 +38,7 @@ GET /user/:userId/profile (Authentication required) => swati
   isDeleted false
 PUT /user/:userId/profile (Authentication and Authorization required) => sweta di
 
-delete/user/:userId/profile (Authentication and Authorization required) => 
+delete/user/:userId/profile (Authentication and Authorization required) => Ankit
 ```
+update
+<!-- hit=following count++,follower count++ -->
