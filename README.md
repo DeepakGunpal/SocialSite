@@ -30,9 +30,12 @@ It contains 5 APIs
 ```bash
 POST /register and aws => deepak
   auto suggest available username
+  follower request - accept request
+  get follower request api 
 POST /login and auth => sunandini soni
 validation => ankit
 post/follow => rubi
+
 GET /user/:userId/profile (Authentication required) => swati
   filterQuery - name(substring), username
   isDeleted false
