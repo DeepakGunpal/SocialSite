@@ -1,7 +1,7 @@
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt')
 const { uploadFile } = require('../utility/aws')
-const { SuggestUserName } = require('../utility/validation')
+const { SuggestUserName,isValidEmail,isValidPass ,isValidBody} = require('../utility/validation')
 
 const createUser = async (req, res) => {
     try {
@@ -71,16 +71,24 @@ const loginUser = async(req,res)=>{
             return res.status(400).send({status:false,message:"plz enter emailId and password"})
          }
          let {email,password} =data
-         if(!valid(email)){
+         if(!isValidBody(email)){
             return res.status(400).send({status:false,message:"email is required"})
          }
+         if(!isValidEmail(email)){
+            return res.status(400).send({status:false,message:"enter valid email"})
+         }
+       
+
         //  email validation
         // user
 
-         if(!valid(password)){
+         if(!isValidBody(password)){
             return res.status(400).send({status:false,message:"password is required"})
          }
          password=password.trim()
+         if(!isValidPass(password)){
+            return res.status(400).send({status:false,message:"enter valid email"})
+         }
         //  password Validation
 
         const emailCheck = await userModel.findOne({ email: email })
