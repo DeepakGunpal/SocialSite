@@ -45,3 +45,27 @@ delete/user/:userId/profile (Authentication and Authorization required) => Ankit
 ```
 update
 <!-- hit=following count++,follower count++ -->
+user--
+
+follow api
+accept/reject api
+
+
+Post Schema--rubi
+
+caption
+photo--url
+video--url
+enum--post type---public/private
+location
+like--default 0
+commentCount-
+comment-[]
+
+
+api---
+createPost---rubi
+get post---sunandini
+update post-- Deepak
+delete post--Swati
+
