@@ -8,7 +8,6 @@ let SuggestUserName = async (inputUserName) => {
     inputUserName = inputUserName + Math.floor(Math.random() * (999 + 1));
     let checkAgain = await userModel.findOne({ userName: inputUserName })
     if (checkAgain) {
-        console.log(true)
         SuggestUserName(inputUserName)
     }
 
