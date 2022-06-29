@@ -69,3 +69,7 @@ get post---sunandini
 update post-- Deepak
 delete post--Swati
 
+
+comment schema
+ref: post, user
+schema: body, image/gif, date,
