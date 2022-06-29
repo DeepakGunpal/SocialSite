@@ -6,6 +6,7 @@ const route = require('./route/route');
 const multer = require("multer");
 
 app.use(express.json());
+app.use(express.urlencoded({extended:true}))
 app.use(multer().any());
 
 mongoose.connect(`mongodb+srv://Swetarun:lBf6gTedHw2tfPtQ@cluster0.ebg8a.mongodb.net/socialSite`, {

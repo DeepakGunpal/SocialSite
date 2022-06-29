@@ -37,7 +37,7 @@ GET /user/:userId/profile (Authentication required) => swati
   filterQuery - name(substring), username
   isDeleted false
 PUT /user/:userId/profile (Authentication and Authorization required) => sweta di
-
+Put /user
 delete/user/:userId/profile (Authentication and Authorization required) => Ankit
 ```
 update

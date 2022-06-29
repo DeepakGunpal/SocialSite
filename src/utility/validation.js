@@ -48,6 +48,7 @@ const isValidObjectId = function (value) {
     return mongoose.Types.ObjectId.isValid(value)
 };
 
+
 // for password  constrainde with a Ideal length
 const isValidPass = function (password) {
     const regx = /^[0-9a-zA-Z!@#$%&*]{8,15}$/
