@@ -407,5 +407,36 @@ const getUser = async (req, res) => {
   }
 };
 
+const getRequests = async (req, res) => {
+  try {
+    let user = await userModel.findOne({ _id: req.params.userId })
+    return res.status(200).send({ status: true, count: user.followersRequest.length, message: "Success", data: user.followersRequest })
 
-module.exports = { createUser, loginUser, updateUser, updatePassword, getUser };
+  } catch (error) {
+    return res.status(500).send({ status: false, error: error.message })
+
+  }
+}
+
+const acceptRequest = async (req, res) => {
+  try {
+    let requestId = req.body.userId
+    let user = await userModel.findOne({ _id: req.params.userId })
+
+    for (let i = 0; i < user.followersRequest.length; i++) {
+      if (requestId == user.followersRequest[i]) {
+        await userModel.findOneAndUpdate({ _id: req.params.userId }, { $pull: { followersRequest: { userId: requestId } } });
+        return res.status(200).send({ status: true, message: `${requestId} started following you` })
+      }
+    }
+
+    res.status(400).send({ status: false, message: `${requestId} has not requested to follow you. Idiot,enter correct userId` })
+
+
+
+  } catch (error) {
+    return res.status(500).send({ status: false, error: error.message })
+  }
+}
+
+module.exports = { createUser, loginUser, updateUser, updatePassword, getUser, getRequests, acceptRequest };
