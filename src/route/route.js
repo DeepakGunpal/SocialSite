@@ -10,5 +10,7 @@ router.get("/user/:userId/profile", getUser)
 router.put("/updateUser/:userId", updateUser)
 router.put("/updatePsd/:userId", updatePassword)
 
+//----------------------------------------------------FEATURE-2_POST API'S----------------------------------------------------------------------------------------//
+router.put("/editPost",)
 
 module.exports = router;
