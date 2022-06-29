@@ -3,18 +3,13 @@ const mongoose  = require('mongoose')  //use for object ID validation
 
 
 //suggest available username
-let SuggestUserName = (inputUserName) => {
+let SuggestUserName = async (inputUserName) => {
 
     inputUserName = inputUserName + Math.floor(Math.random() * (999 + 1));
-    // console.log(inputUserName)
-    // let checkAgain = await userModel.findOne({ userName: inputUserName })
-
-
-    // console.log(checkAgain)
-    // if (checkAgain) {
-    //     console.log(true)
-    //     SuggestUserName(inputUserName)
-    // }
+    let checkAgain = await userModel.findOne({ userName: inputUserName })
+    if (checkAgain) {
+        SuggestUserName(inputUserName)
+    }
 
     return inputUserName;
 }
@@ -47,6 +42,7 @@ const isValidEmail = function (value) {
 const isValidObjectId = function (value) {
     return mongoose.Types.ObjectId.isValid(value)
 };
+
 
 // for password  constrainde with a Ideal length
 const isValidPass = function (password) {
