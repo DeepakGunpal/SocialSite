@@ -1,5 +1,5 @@
 const userModel = require('../models/userModel')
-const mongoose  = require('mongoose')  //use for object ID validation
+const mongoose = require('mongoose')  //use for object ID validation
 
 
 //suggest available username
@@ -16,7 +16,13 @@ let SuggestUserName = async (inputUserName) => {
 
 const validFileRegex = /^.+\.(?:(?:[dD][oO][cC][xX]?)|(?:[pP][dD][fF])|(?:[pP][nN][gG])|(?:[jJ][pP][gG]))$/
 
+const enumGender = (gender) => {
+    if (!["Male", "Female", "LGBTQ", "Prefer not to say"].includes(gender)) {
+        return false;
+    }
+    return true;
 
+}
 ///  for empty input
 
 const isValidBody = function (value) {
@@ -52,4 +58,4 @@ const isValidPass = function (password) {
 
 
 
-module.exports = { validFileRegex, SuggestUserName, isValidBody, isValidPhone, isValidEmail, isValidObjectId, isValidPass }
+module.exports = { validFileRegex, SuggestUserName, isValidBody, isValidPhone, isValidEmail, isValidObjectId, isValidPass, enumGender }
