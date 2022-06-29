@@ -3,6 +3,7 @@ const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt')
 const { uploadFile } = require('../utility/aws')
 const { SuggestUserName } = require('../utility/validation')
+const validator = require('../utility/validation.js');
 
 const createUser = async (req, res) => {
     try {
@@ -64,8 +65,10 @@ const createUser = async (req, res) => {
     } catch (error) {
         res.status(500).send({ status: false, message: error.message })
     }
-
 }
+
+//-------------------------------------------------------------------LOGIN-USER---------------------------------------------------------------------//
+
 const loginUser = async (req, res) => {
     try {
         let data = req.body
@@ -93,9 +96,9 @@ const loginUser = async (req, res) => {
 
         const dbPassword = emailCheck.password
 
-        const passwordMathched = await bcrypt.compare(password, dbPassword)
-        if (!passwordMathched) {
-            return res.status(401).send({ status: false, message: "Please provide valid credentils" })
+        const passwordMatched = await bcrypt.compare(password, dbPassword)
+        if (!passwordMatched) {
+            return res.status(401).send({ status: false, message: "Please provide valid credentials" })
         }
 
         let fName = emailCheck.firstName
@@ -119,7 +122,68 @@ const loginUser = async (req, res) => {
     // compate password with bycript
     // generate token after successful varification
     // send token in responce
-
 }
 
-module.exports = { createUser, loginUser }
+
+//------------------------------------------------------get User --------------------------------------------------------------------------//
+
+const getUser = async (req, res) => {
+
+    try {
+        let filterQuery = req.query;
+        let userId = req.params.userId
+       // let tokenId = req.userId
+
+        if (!(validator.isValidBody(userId))) {
+            return res.status(400).send({ status: false, message: "Please Provide User Id" })
+        }
+
+        if (!(validator.isValidObjectId(userId))) {
+            return res.status(400).send({ status: false, message: "invalid userId" })
+        }
+
+        // if (!(userId == tokenId)) {
+        //     return res.status(401).send({ status: false, message: "Unauthorized User" })
+        // }
+
+        let { Name, firstName, Institute, place, email } = filterQuery;
+
+       
+            let query = { isDeleted: false }
+
+            if (Name) {
+                query['userName'] = {$regex: Name}
+            }
+
+            if (firstName) {
+                query['firstName'] = { $regex: firstName }
+            }
+
+            if (Institute) {
+                query['Institute'] = Institute 
+            }
+
+            if (place) {
+                query['Location'] = place 
+            }
+
+            if (email) {
+                query['email'] = email
+            }
+
+            let getAllUser = await userModel.find(query)
+
+            if (getAllUser.length < 0) {
+                return res.status(404).send({ status: false, message: "user does not exists from this detail" })
+            }
+            return res.status(200).send({ status: true, count: getAllUser.length, message: "Success", data: getAllUser })
+
+    }
+    catch (error) {
+        return res.status(500).send({ status: false, error: error.message })
+
+    }
+};
+
+
+module.exports = { createUser, loginUser, getUser }

@@ -4,10 +4,12 @@ const userSchema = new mongoose.Schema({
     firstName: { type: String, required: true, trim: true },
     lastName: { type: String, required: true, trim: true },
     userName: { type: String, required: true, unique: true, trim: true },
+    Location: {type: String, trim: true},
     gender: { type: String, trim: true, enum: ["Male", "Female", "LGBTQ", "Prefer not to say"] },//drop down list
     email: { type: String, required: true, unique: true, trim: true },
     phone: { type: Number, required: true, unique: true, trim: true },
     password: { type: String, required: true, trim: true },
+    Institute: { type: String, trim: true},
     profileImage: { type: String },
     postCount: { type: Number, default: 0 },
     posts: { type: Array, default: [] },
