@@ -1,12 +1,13 @@
 require("dotenv").config();
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const validator = require('../utility/validation.js');
 const { uploadFile } = require("../utility/aws");
 const { SuggestUserName, isValidObjectId, isValidPass, isValidBody, enumGender } = require("../utility/validation");
 
 //checking user exists or not 
 const isValidUser = async function (value) {
-  //-------------------should it for user value wherever required
+  //-------------------should use it for user value wherever required
   let user = await userModel.findOne({ _id: value });
   return user;
 };
@@ -158,6 +159,9 @@ const createUser = async (req, res) => {
     res.status(500).send({ status: false, message: error.message })
   }
 }
+
+//-------------------------------------------------------------------LOGIN-USER---------------------------------------------------------------------//
+
 const loginUser = async (req, res) => {
   try {
     let data = req.body;
@@ -222,6 +226,8 @@ const loginUser = async (req, res) => {
   // send token in responce
 };
 
+
+//-------------------------------------------------------updateUser-----------------------------------------------------------------------------//
 const updateUser = async (req, res) => {
   let userId = req.params.userId;
   if (!isValidObjectId(userId)) {
@@ -340,4 +346,66 @@ const updatePassword = async function (req, res) {
     .send({ status: true, message: "Password Updated Succefully" });
 };
 
-module.exports = { createUser, loginUser, updateUser, updatePassword };
+
+//------------------------------------------------------get User --------------------------------------------------------------------------//
+
+const getUser = async (req, res) => {
+
+    try {
+        let filterQuery = req.query;
+        let userId = req.params.userId
+       // let tokenId = req.userId
+
+        if (!(validator.isValidBody(userId))) {
+            return res.status(400).send({ status: false, message: "Please Provide User Id" })
+        }
+
+        if (!(validator.isValidObjectId(userId))) {
+            return res.status(400).send({ status: false, message: "invalid userId" })
+        }
+
+        // if (!(userId == tokenId)) {
+        //     return res.status(401).send({ status: false, message: "Unauthorized User" })
+        // }
+
+        let { Name, firstName, Institute, place, email } = filterQuery;
+
+       
+            let query = { isDeleted: false }
+
+            if (Name) {
+                query['userName'] = {$regex: Name}
+            }
+
+            if (firstName) {
+                query['firstName'] = { $regex: firstName }
+            }
+
+            if (Institute) {
+                query['Institute'] = Institute 
+            }
+
+            if (place) {
+                query['Location'] = place 
+            }
+
+            if (email) {
+                query['email'] = email
+            }
+
+            let getAllUser = await userModel.find(query)
+
+            if (getAllUser.length < 0) {
+                return res.status(404).send({ status: false, message: "user does not exists from this detail" })
+            }
+            return res.status(200).send({ status: true, count: getAllUser.length, message: "Success", data: getAllUser })
+
+    }
+    catch (error) {
+        return res.status(500).send({ status: false, error: error.message })
+
+    }
+};
+
+
+module.exports = { createUser, loginUser, updateUser, updatePassword, getUser };
