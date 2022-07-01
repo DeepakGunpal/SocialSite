@@ -28,17 +28,44 @@ It contains 5 APIs
 ### User APIs
 
 ```bash
-POST /register and aws => deepak
+POST /register and aws => deepak //plz add location, interests, recommendedcount, school, college, workplace, status
   auto suggest available username
+  follower request - accept request
+  get follower request api
 POST /login and auth => sunandini soni
 validation => ankit
 post/follow => rubi
+
 GET /user/:userId/profile (Authentication required) => swati
   filterQuery - name(substring), username
   isDeleted false
 PUT /user/:userId/profile (Authentication and Authorization required) => sweta di
-
+Put /user
 delete/user/:userId/profile (Authentication and Authorization required) => Ankit
 ```
+
 update
+
 <!-- hit=following count++,follower count++ -->
+
+user--
+
+follow api
+accept/reject api
+
+Post Schema--rubi
+
+caption
+photo--url
+video--url
+enum--post type---public/private
+location
+like--default 0
+commentCount-
+comment-[]
+
+api---
+createPost---rubi
+get post---sunandini
+update post-- Deepak
+delete post--Swati
