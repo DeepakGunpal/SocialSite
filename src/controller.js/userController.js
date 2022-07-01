@@ -2,7 +2,8 @@ require('dotenv').config();
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt')
 const { uploadFile } = require('../utility/aws')
-const { SuggestUserName } = require('../utility/validation')
+const { SuggestUserName, isValidBody, isValidEmail, isValidObjectId } = require('../utility/validation');
+const { validate, exists } = require('../models/userModel');
 
 const createUser = async (req, res) => {
     try {
@@ -122,4 +123,79 @@ const loginUser = async (req, res) => {
 
 }
 
-module.exports = { createUser, loginUser }
+///  = Delete API's
+const userDelete = async function (req, res) {
+    try{
+        let userId = req.params.userId   // input user's ID (authentic)
+        let data = req.body
+        // Authorization here
+         
+        // empty body check
+        if(!isValidBody(data)) return 'please enter a User Id to delete';
+        if(!isValidBody(userId) || !isValidObjectId(userId))  return 'please enter your valid user Id in Params'
+        if(!isValidObjectId(data.userId) || isValidBody(data.userId)) return 'please enter a valid user Id'
+
+        // validation & DB call for exist check
+        const existCheck = await userModel.findOneAndUpdate({_id: data.userId, isDeleted:false}, {isDeleted:true, deletedAt: Date.now()}, {new: true})
+
+        //if does not exist
+        if(!existCheck) return 'user does not exists'
+        //giving response
+        res.status(201).send({status: true, message: 'User Deleted Successfully', data: existCheck})
+    }
+
+    catch(err){
+        res.status(500).send({status: false, message: 'err.Message'})
+    }   
+
+}
+
+// Follower Api's
+const following = async function (req, res) {
+    try{
+        let userId = req.params.userId
+        let data = req.body
+        //  Validation and empty check
+        if(!isValidBody(userId) || !isValidObjectId(userId)) return ' Please!, enter your valid userId in Params'
+        if(!isValidBody(data)) return 'Please!, fill mandatory fields to run this functionality'
+
+        if(!isValidObjectId(data.userId)|| !isValidBody(data.userId)) return 'Please!, enter a valid Object Id of the person whom you want to follow'
+
+        // DB call for Id check( if we're going to update things while checking and in the time of second ID check if we'll not get any result then the First updation will getting false so............)
+        /**
+         * kya function bana ke invocation kiya ja skta h?
+         * kya dono ko hi && operator ke saath if condition me daal ke run kara du  -- but shaayd wo read karne ke saath saath hi update bhi kar dega
+         *  solution by me = ek ka existance check kar lete h, dusre me findoneAndUpdate laga dunga.
+         */
+
+        const userCheck = await userModel.findOne({_id: userId, isDelted: false})
+        if (!userCheck) return 'UserId given in Params does not exists'
+
+        const followingUpdate = await userModel.findOneAndUpdate({_id:data.userId, isDeleted: false},{$inc:{following:+1}, $push:{following:userId}}, {new:true})
+        if(!followingUpdate) return "follower profile does't exists"
+
+        const userUpdate = await userModel.findOneAndUpdate({_id:userId, isDelted:false}, {$push:{followers:data.userId}}, {new:true})
+
+        res.status(201).send({status:true, message: `you followed ${data.userId}`})
+
+    }
+    catch(err){
+        res.status(500).send({status: false, message:'err.Message'})
+    }
+}
+
+
+
+
+module.exports = { createUser, loginUser, userDelete, following }
+
+
+
+
+// ============    ANKIT'S WORK ===========
+/**
+ * follower controller - on click - path params would have authencitcated user ID,
+ *  body me jisko follow karna h uski user id jayegi, hit karte hi, sweta didi ka ek following count +1 karna h, aur uske array me ankit ki detail aayegi.
+ * 
+ * ankit ki id me follwer count +1 hoga, follower ke array me sweta didi aa jayengi. 
+ */
