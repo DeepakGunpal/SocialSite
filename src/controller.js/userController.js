@@ -2,7 +2,13 @@ require('dotenv').config();
 const userModel = require('../models/userModel');
 const bcrypt = require('bcrypt')
 const { uploadFile } = require('../utility/aws')
-const { SuggestUserName, isValidBody } = require('../utility/validation')
+const { SuggestUserName, isValidBody,isValidEmail,isValidPass } = require('../utility/validation')
+const jwt =require("jsonwebtoken")
+
+let user = async (data)=>{
+    let check =await userModel.findOne(data)
+    return check
+}
 
 const createUser = async (req, res) => {
     try {
@@ -119,13 +125,8 @@ const loginUser = async (req, res) => {
          if(!isValidBody(email)){
             return res.status(400).send({status:false,message:"email is required"})
          }
-         if(!isValidEmail(email)){
-            return res.status(400).send({status:false,message:"enter valid email"})
-         }
-       
 
-        //  email validation
-        // user
+        
 
          if(!isValidBody(password)){
             return res.status(400).send({status:false,message:"password is required"})
@@ -136,9 +137,10 @@ const loginUser = async (req, res) => {
          }
         //  password Validation
 
-        const emailCheck = await userModel.findOne({ email: email })
+        const emailCheck = await user({ $or:[{email: email},{userName:email}] })
+        console.log(module);
         if (!emailCheck) {
-            return res.status(404).send({ status: false, message: "Email not found" })
+            return res.status(404).send({ status: false, message: `${email} not found` })
         }
 
         const dbPassword = emailCheck.password
@@ -157,18 +159,14 @@ const loginUser = async (req, res) => {
             },
             process.env.SecretKey, { expiresIn: "24hr" }
         );
-
-        return res.status(200).send({ message: ` welcome ${fName}  ${lName}` })
+           res.setHeader("token",token)
+        return res.status(200).send({ message: ` welcome👽👽 ${fName}  ${lName}` })
 
     } catch (error) {
         res.status(500).send({ status: false, message: error.message })
     }
 
-    // credential should be present
-    // verify the correct format of email and password
-    // compate password with bycript
-    // generate token after successful varification
-    // send token in responce
+   
 
 }
 
