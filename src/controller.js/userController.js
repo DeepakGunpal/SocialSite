@@ -422,21 +422,22 @@ const getRequests = async (req, res) => {
 const userDelete = async function (req, res) {
     try{
         let userId = req.params.userId   // input user's ID (authentic)
-        let data = req.body
+        // let data = req.body
         // Authorization here
          
         // empty body check
-        if(!isValidBody(data)) return 'please enter a User Id to delete';
-        if(!isValidBody(userId) || !isValidObjectId(userId))  return 'please enter your valid user Id in Params'
-        if(!isValidObjectId(data.userId) || isValidBody(data.userId)) return 'please enter a valid user Id'
+        // if(!isValidBody(data)) return 'please enter a User Id to delete';
+        console.log('hello idhar aao')
+        if(!isValidBody(userId) || !isValidObjectId(userId))  return res.status(400).send({msg: 'please enter your valid user Id in Params'})
+        // if(!isValidObjectId(data.userId) || isValidBody(data.userId)) return 'please enter a valid user Id'
 
         // validation & DB call for exist check
-        const existCheck = await userModel.findOneAndUpdate({_id: data.userId, isDeleted:false}, {isDeleted:true, deletedAt: Date.now()}, {new: true})
+        const existCheck = await userModel.findOneAndUpdate({_id: userId, isDeleted:false}, {isDeleted:true, deletedAt: Date.now()}, {new: true})
 
-        //if does not exist
-        if(!existCheck) return 'user does not exists'
-        //giving response
-        res.status(201).send({status: true, message: 'User Deleted Successfully', data: existCheck})
+        // if does not exist
+        if(!existCheck) return res.status(404).send({msg: 'user does not exists'})
+        // giving response
+        res.status(204).send({status: true, message: 'User Deleted Successfully', data: existCheck})
     }
 
     catch(err){
@@ -463,15 +464,17 @@ const following = async function (req, res) {
          *  solution by me = ek ka existance check kar lete h, dusre me findoneAndUpdate laga dunga.
          */
 
-        const userCheck = await userModel.findOne({_id: userId, isDelted: false})
-        if (!userCheck) return 'UserId given in Params does not exists'
+        // const userCheck = await userModel.findOne({_id: userId, isDeleted: false})
+        // if (!userCheck) return 'UserId given in Params does not exists'
+        if(userId==data.userId) return res.status(409).send({status: false, message:" Not Allowed! "})
 
-        const followingUpdate = await userModel.findOneAndUpdate({_id:data.userId, isDeleted: false},{$inc:{following:+1}, $push:{following:userId}}, {new:true})
-        if(!followingUpdate) return "follower profile does't exists"
+        const followersReq = await userModel.findOneAndUpdate({_id:data.userId, isDeleted: false},{$addToSet:{followersRequest:userId}}, {new:true})
+        if(!followersReq) return res.status(404).send({status: false, message:"follower profile does't exists"})
+        console.log(followersReq)
 
-        const userUpdate = await userModel.findOneAndUpdate({_id:userId, isDelted:false}, {$push:{followers:data.userId}}, {new:true})
+        // const userUpdate = await userModel.findOneAndUpdate({_id:userId, isDelted:false}, {$push:{followers:data.userId}}, {new:true})
 
-        res.status(201).send({status:true, message: `you followed ${data.userId}`})
+        res.status(200).send({status:true, message: `you followed ${data.userId}`})
 
     }
     catch(err){
