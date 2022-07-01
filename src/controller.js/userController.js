@@ -3,7 +3,7 @@ const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const validator = require('../utility/validation.js');
 const { uploadFile } = require("../utility/aws");
-const { SuggestUserName, isValidObjectId, isValidPass, isValidBody, enumGender } = require("../utility/validation");
+const { SuggestUserName, isValidObjectId, isValidPass, isValidBody, enumGender,isValidEmail, isValidPhone } = require("../utility/validation");
 
 //checking user exists or not 
 const isValidUser = async function (value) {
@@ -43,16 +43,16 @@ const createUser = async (req, res) => {
         message: `userName is required`,
       });
     }
-    if (!isValidBody(email)) {
+    if (!isValidBody(email) || isValidEmail(email)) {
       return res.status(400).send({
         status: false,
-        message: `email is required`,
+        message: `Please! enter a valid email.`,
       });
     }
-    if (!isValidBody(phone)) {
+    if (!isValidBody(phone) || isValidPhone(phone)) {
       return res.status(400).send({
         status: false,
-        message: `phone is required`,
+        message: `Please!, enter a valid phone.`,
       });
     }
 
@@ -488,22 +488,35 @@ const acceptRequest = async (req, res) => {
     let requestId = req.body.userId
     let user = await userModel.findOne({ _id: req.params.userId })
 
+    let action = req.body.action
+
     //increase follower count
     for (let i = 0; i < user.followersRequest.length; i++) {
-      if (requestId == user.followersRequest[i]) {
-        await userModel.findOneAndUpdate({ _id: req.params.userId }, { $pull: { followersRequest: { userId: requestId } } }, { $inc: { totalFollower: 1 } });
+      if (requestId == user.followersRequest[i] && action==1) {
+        await userModel.findOneAndUpdate({ _id: req.params.userId }, {$pull: { followersRequest:user.followersRequest[i] },  $inc: { totalFollower: 1 }, $addToSet:{followers:user.followersRequest[i]} });
+
+        await userModel.findOneAndUpdate({ _id: requestId }, { $inc: { totalFollowing: 1 } , $addToSet:{following:req.params.userId}})
+
         return res.status(200).send({ status: true, message: `${requestId} started following you` })
+      }
+
+      if(requestId == user.followersRequest[i] && action==0){
+        await userModel.findOneAndUpdate({ _id: req.params.userId }, {$pull: { followersRequest:user.followersRequest[i] }});
+        return res.status(400).send({ status: false, message: `${requestId} has rejected` })
       }
     }
 
     //increase following count
-    const incFollowing = await userModel.findOneAndUpdate({ _id: requestId }, { $inc: { totalFollowing: 1 } })
+    // const incFollowing = await userModel.findOneAndUpdate({ _id: requestId }, { $inc: { totalFollowing: 1 } , $addToSet:{following:req.params.userId}})
 
     res.status(400).send({ status: false, message: `${requestId} has not requested to follow you. Enter correct userId, Idiot` })
+
+
 
   } catch (error) {
     return res.status(500).send({ status: false, error: error.message })
   }
 }
+
 
 module.exports = { createUser, loginUser, updateUser, updatePassword, getUser, getRequests, acceptRequest, userDelete, following };
