@@ -434,7 +434,7 @@ const acceptRequest = async (req, res) => {
     //increase following count
     const incFollowing = await userModel.findOneAndUpdate({ _id: requestId }, { $inc: { totalFollowing: 1 } })
 
-    res.status(400).send({ status: false, message: `${requestId} has not requested to follow you. Idiot,enter correct userId` })
+    res.status(400).send({ status: false, message: `${requestId} has not requested to follow you. Enter correct userId, Idiot` })
 
   } catch (error) {
     return res.status(500).send({ status: false, error: error.message })
