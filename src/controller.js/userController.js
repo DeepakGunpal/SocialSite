@@ -423,16 +423,18 @@ const acceptRequest = async (req, res) => {
     let requestId = req.body.userId
     let user = await userModel.findOne({ _id: req.params.userId })
 
+    //increase follower count
     for (let i = 0; i < user.followersRequest.length; i++) {
       if (requestId == user.followersRequest[i]) {
-        await userModel.findOneAndUpdate({ _id: req.params.userId }, { $pull: { followersRequest: { userId: requestId } } });
+        await userModel.findOneAndUpdate({ _id: req.params.userId }, { $pull: { followersRequest: { userId: requestId } } }, { $inc: { totalFollower: 1 } });
         return res.status(200).send({ status: true, message: `${requestId} started following you` })
       }
     }
 
+    //increase following count
+    const incFollowing = await userModel.findOneAndUpdate({ _id: requestId }, { $inc: { totalFollowing: 1 } })
+
     res.status(400).send({ status: false, message: `${requestId} has not requested to follow you. Idiot,enter correct userId` })
-
-
 
   } catch (error) {
     return res.status(500).send({ status: false, error: error.message })
