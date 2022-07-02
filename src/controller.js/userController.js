@@ -49,13 +49,13 @@ const createUser = async (req, res) => {
         message: `userName is required`,
       });
     }
-    if (!isValidBody(email) || isValidEmail(email)) {
+    if (!isValidBody(email) || !isValidEmail(email)) {
       return res.status(400).send({
         status: false,
         message: `Please! enter a valid email.`,
       });
     }
-    if (!isValidBody(phone) || isValidPhone(phone)) {
+    if (!isValidBody(phone) || !isValidPhone(phone)) {
       return res.status(400).send({
         status: false,
         message: `Please!, enter a valid phone.`,
