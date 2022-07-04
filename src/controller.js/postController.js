@@ -23,7 +23,7 @@ const updatePost = async (req, res) => {
                 .send({ status: false, message: "Please provide correct userId" });
         }
 
-        //-----------------upload profileImage---------------------
+        //-----------------update postImage---------------------
 
         let files = req.files;
         if (files && files.length > 0) {
