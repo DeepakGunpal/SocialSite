@@ -2,12 +2,12 @@ require("dotenv").config();
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const { uploadFile } = require("../utility/aws");
-const { SuggestUserName, isValidObjectId, isValidPass, isValidBody, enumGender,isValidEmail, isValidPhone } = require("../utility/validation");
-const jwt =require("jsonwebtoken")
+const { SuggestUserName, isValidObjectId, isValidPass, isValidBody, enumGender, isValidEmail, isValidPhone } = require("../utility/validation");
+const jwt = require("jsonwebtoken")
 
-let user = async (data)=>{
-    let check =await userModel.findOne(data)
-    return check
+let user = async (data) => {
+  let check = await userModel.findOne(data)
+  return check
 }
 
 
@@ -169,58 +169,58 @@ const createUser = async (req, res) => {
 //-------------------------------------------------------------------LOGIN-USER---------------------------------------------------------------------//
 
 const loginUser = async (req, res) => {
-    try {
-        let data = req.body
-         // condition to check body should not be empty
-         if(!data){
-            return res.status(400).send({status:false,message:"plz enter emailId and password"})
-         }
-         let {email,password} =data
-         if(!isValidBody(email)){
-            return res.status(400).send({status:false,message:"email is required"})
-         }
-
-        
-
-         if(!isValidBody(password)){
-            return res.status(400).send({status:false,message:"password is required"})
-         }
-         password=password.trim()
-         if(!isValidPass(password)){
-            return res.status(400).send({status:false,message:"enter valid email"})
-         }
-        //  password Validation
-
-        const emailCheck = await user({ $or:[{email: email},{userName:email}] })
-        console.log(module);
-        if (!emailCheck) {
-            return res.status(404).send({ status: false, message: `${email} not found` })
-        }
-
-        const dbPassword = emailCheck.password
-
-        const passwordMathched = await bcrypt.compare(password, dbPassword)
-        if (!passwordMathched) {
-            return res.status(401).send({ status: false, message: "Please provide valid credentils" })
-        }
-
-        let fName = emailCheck.firstName
-        let lName = emailCheck.lastName
-        let userId = emailCheck._id
-        const token = jwt.sign(
-            {
-                userId: userId
-            },
-            process.env.SecretKey, { expiresIn: "24hr" }
-        );
-           res.setHeader("token",token)
-        return res.status(200).send({ message: ` welcome👽👽 ${fName}  ${lName}` })
-
-    } catch (error) {
-        res.status(500).send({ status: false, message: error.message })
+  try {
+    let data = req.body
+    // condition to check body should not be empty
+    if (!data) {
+      return res.status(400).send({ status: false, message: "plz enter emailId and password" })
+    }
+    let { email, password } = data
+    if (!isValidBody(email)) {
+      return res.status(400).send({ status: false, message: "email is required" })
     }
 
-   
+
+
+    if (!isValidBody(password)) {
+      return res.status(400).send({ status: false, message: "password is required" })
+    }
+    password = password.trim()
+    if (!isValidPass(password)) {
+      return res.status(400).send({ status: false, message: "enter valid email" })
+    }
+    //  password Validation
+
+    const emailCheck = await user({ $or: [{ email: email }, { userName: email }] })
+    console.log(module);
+    if (!emailCheck) {
+      return res.status(404).send({ status: false, message: `${email} not found` })
+    }
+
+    const dbPassword = emailCheck.password
+
+    const passwordMathched = await bcrypt.compare(password, dbPassword)
+    if (!passwordMathched) {
+      return res.status(401).send({ status: false, message: "Please provide valid credentils" })
+    }
+
+    let fName = emailCheck.firstName
+    let lName = emailCheck.lastName
+    let userId = emailCheck._id
+    const token = jwt.sign(
+      {
+        userId: userId
+      },
+      process.env.SecretKey, { expiresIn: "24hr" }
+    );
+    res.setHeader("token", token)
+    return res.status(200).send({ message: ` welcome👽👽 ${fName}  ${lName}` })
+
+  } catch (error) {
+    res.status(500).send({ status: false, message: error.message })
+  }
+
+
 
 }
 
@@ -418,66 +418,66 @@ const getRequests = async (req, res) => {
 
 ///  = Delete API's
 const userDelete = async function (req, res) {
-    try{
-        let userId = req.params.userId   // input user's ID (authentic)
-        // let data = req.body
-        // Authorization here
-         
-        // empty body check
-        // if(!isValidBody(data)) return 'please enter a User Id to delete';
-        console.log('hello idhar aao')
-        if(!isValidBody(userId) || !isValidObjectId(userId))  return res.status(400).send({msg: 'please enter your valid user Id in Params'})
-        // if(!isValidObjectId(data.userId) || isValidBody(data.userId)) return 'please enter a valid user Id'
+  try {
+    let userId = req.params.userId   // input user's ID (authentic)
+    // let data = req.body
+    // Authorization here
 
-        // validation & DB call for exist check
-        const existCheck = await userModel.findOneAndUpdate({_id: userId, isDeleted:false}, {isDeleted:true, deletedAt: Date.now()}, {new: true})
+    // empty body check
+    // if(!isValidBody(data)) return 'please enter a User Id to delete';
+    console.log('hello idhar aao')
+    if (!isValidBody(userId) || !isValidObjectId(userId)) return res.status(400).send({ msg: 'please enter your valid user Id in Params' })
+    // if(!isValidObjectId(data.userId) || isValidBody(data.userId)) return 'please enter a valid user Id'
 
-        // if does not exist
-        if(!existCheck) return res.status(404).send({msg: 'user does not exists'})
-        // giving response
-        res.status(204).send({status: true, message: 'User Deleted Successfully', data: existCheck})
-    }
+    // validation & DB call for exist check
+    const existCheck = await userModel.findOneAndUpdate({ _id: userId, isDeleted: false }, { isDeleted: true, deletedAt: Date.now() }, { new: true })
 
-    catch(err){
-        res.status(500).send({status: false, message: 'err.Message'})
-    }   
+    // if does not exist
+    if (!existCheck) return res.status(404).send({ msg: 'user does not exists' })
+    // giving response
+    res.status(204).send({ status: true, message: 'User Deleted Successfully', data: existCheck })
+  }
+
+  catch (err) {
+    res.status(500).send({ status: false, message: 'err.Message' })
+  }
 
 }
 
 // Follower Api's
 const following = async function (req, res) {
-    try{
-        let userId = req.params.userId
-        let data = req.body
-        //  Validation and empty check
-        if(!isValidBody(userId) || !isValidObjectId(userId)) return ' Please!, enter your valid userId in Params'
-        if(!isValidBody(data)) return 'Please!, fill mandatory fields to run this functionality'
+  try {
+    let userId = req.params.userId
+    let data = req.body
+    //  Validation and empty check
+    if (!isValidBody(userId) || !isValidObjectId(userId)) return ' Please!, enter your valid userId in Params'
+    if (!isValidBody(data)) return 'Please!, fill mandatory fields to run this functionality'
 
-        if(!isValidObjectId(data.userId)|| !isValidBody(data.userId)) return 'Please!, enter a valid Object Id of the person whom you want to follow'
+    if (!isValidObjectId(data.userId) || !isValidBody(data.userId)) return 'Please!, enter a valid Object Id of the person whom you want to follow'
 
-        // DB call for Id check( if we're going to update things while checking and in the time of second ID check if we'll not get any result then the First updation will getting false so............)
-        /**
-         * kya function bana ke invocation kiya ja skta h?
-         * kya dono ko hi && operator ke saath if condition me daal ke run kara du  -- but shaayd wo read karne ke saath saath hi update bhi kar dega
-         *  solution by me = ek ka existance check kar lete h, dusre me findoneAndUpdate laga dunga.
-         */
+    // DB call for Id check( if we're going to update things while checking and in the time of second ID check if we'll not get any result then the First updation will getting false so............)
+    /**
+     * kya function bana ke invocation kiya ja skta h?
+     * kya dono ko hi && operator ke saath if condition me daal ke run kara du  -- but shaayd wo read karne ke saath saath hi update bhi kar dega
+     *  solution by me = ek ka existance check kar lete h, dusre me findoneAndUpdate laga dunga.
+     */
 
-        // const userCheck = await userModel.findOne({_id: userId, isDeleted: false})
-        // if (!userCheck) return 'UserId given in Params does not exists'
-        if(userId==data.userId) return res.status(409).send({status: false, message:" Not Allowed! "})
+    // const userCheck = await userModel.findOne({_id: userId, isDeleted: false})
+    // if (!userCheck) return 'UserId given in Params does not exists'
+    if (userId == data.userId) return res.status(409).send({ status: false, message: " Not Allowed! " })
 
-        const followersReq = await userModel.findOneAndUpdate({_id:data.userId, isDeleted: false},{$addToSet:{followersRequest:userId}}, {new:true})
-        if(!followersReq) return res.status(404).send({status: false, message:"follower profile does't exists"})
-        console.log(followersReq)
+    const followersReq = await userModel.findOneAndUpdate({ _id: data.userId, isDeleted: false }, { $addToSet: { followersRequest: userId } }, { new: true })
+    if (!followersReq) return res.status(404).send({ status: false, message: "follower profile does't exists" })
+    console.log(followersReq)
 
-        // const userUpdate = await userModel.findOneAndUpdate({_id:userId, isDelted:false}, {$push:{followers:data.userId}}, {new:true})
+    // const userUpdate = await userModel.findOneAndUpdate({_id:userId, isDelted:false}, {$push:{followers:data.userId}}, {new:true})
 
-        res.status(200).send({status:true, message: `you followed ${data.userId}`})
+    res.status(200).send({ status: true, message: `you followed ${data.userId}` })
 
-    }
-    catch(err){
-        res.status(500).send({status: false, message:'err.Message'})
-    }
+  }
+  catch (err) {
+    res.status(500).send({ status: false, message: 'err.Message' })
+  }
 }
 
 
@@ -490,16 +490,16 @@ const acceptRequest = async (req, res) => {
 
     //increase follower count
     for (let i = 0; i < user.followersRequest.length; i++) {
-      if (requestId == user.followersRequest[i] && action==1) {
-        await userModel.findOneAndUpdate({ _id: req.params.userId }, {$pull: { followersRequest:user.followersRequest[i] },  $inc: { totalFollower: 1 }, $addToSet:{followers:user.followersRequest[i]} });
+      if (requestId == user.followersRequest[i] && action == 1) {
+        await userModel.findOneAndUpdate({ _id: req.params.userId }, { $pull: { followersRequest: user.followersRequest[i] }, $inc: { totalFollower: 1 }, $addToSet: { followers: user.followersRequest[i] } });
 
-        await userModel.findOneAndUpdate({ _id: requestId }, { $inc: { totalFollowing: 1 } , $addToSet:{following:req.params.userId}})
+        await userModel.findOneAndUpdate({ _id: requestId }, { $inc: { totalFollowing: 1 }, $addToSet: { following: req.params.userId } })
 
         return res.status(200).send({ status: true, message: `${requestId} started following you` })
       }
 
-      if(requestId == user.followersRequest[i] && action==0){
-        await userModel.findOneAndUpdate({ _id: req.params.userId }, {$pull: { followersRequest:user.followersRequest[i] }});
+      if (requestId == user.followersRequest[i] && action == 0) {
+        await userModel.findOneAndUpdate({ _id: req.params.userId }, { $pull: { followersRequest: user.followersRequest[i] } });
         return res.status(400).send({ status: false, message: `${requestId} has rejected` })
       }
     }
