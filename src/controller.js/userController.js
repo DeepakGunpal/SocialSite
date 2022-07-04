@@ -1,9 +1,15 @@
 require("dotenv").config();
 const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
-const validator = require('../utility/validation.js');
 const { uploadFile } = require("../utility/aws");
-const { SuggestUserName, isValidObjectId, isValidPass, isValidBody, enumGender } = require("../utility/validation");
+const { SuggestUserName, isValidObjectId, isValidPass, isValidBody, enumGender,isValidEmail, isValidPhone } = require("../utility/validation");
+const jwt =require("jsonwebtoken")
+
+let user = async (data)=>{
+    let check =await userModel.findOne(data)
+    return check
+}
+
 
 //checking user exists or not 
 const isValidUser = async function (value) {
@@ -43,16 +49,16 @@ const createUser = async (req, res) => {
         message: `userName is required`,
       });
     }
-    if (!isValidBody(email)) {
+    if (!isValidBody(email) || !isValidEmail(email)) {
       return res.status(400).send({
         status: false,
-        message: `email is required`,
+        message: `Please! enter a valid email.`,
       });
     }
-    if (!isValidBody(phone)) {
+    if (!isValidBody(phone) || !isValidPhone(phone)) {
       return res.status(400).send({
         status: false,
-        message: `phone is required`,
+        message: `Please!, enter a valid phone.`,
       });
     }
 
@@ -163,68 +169,60 @@ const createUser = async (req, res) => {
 //-------------------------------------------------------------------LOGIN-USER---------------------------------------------------------------------//
 
 const loginUser = async (req, res) => {
-  try {
-    let data = req.body;
-    // condition to check body should not be empty
-    if (!data) {
-      return res
-        .status(400)
-        .send({ status: false, message: "plz enter emailId and password" });
+    try {
+        let data = req.body
+         // condition to check body should not be empty
+         if(!data){
+            return res.status(400).send({status:false,message:"plz enter emailId and password"})
+         }
+         let {email,password} =data
+         if(!isValidBody(email)){
+            return res.status(400).send({status:false,message:"email is required"})
+         }
+
+        
+
+         if(!isValidBody(password)){
+            return res.status(400).send({status:false,message:"password is required"})
+         }
+         password=password.trim()
+         if(!isValidPass(password)){
+            return res.status(400).send({status:false,message:"enter valid email"})
+         }
+        //  password Validation
+
+        const emailCheck = await user({ $or:[{email: email},{userName:email}] })
+        console.log(module);
+        if (!emailCheck) {
+            return res.status(404).send({ status: false, message: `${email} not found` })
+        }
+
+        const dbPassword = emailCheck.password
+
+        const passwordMathched = await bcrypt.compare(password, dbPassword)
+        if (!passwordMathched) {
+            return res.status(401).send({ status: false, message: "Please provide valid credentils" })
+        }
+
+        let fName = emailCheck.firstName
+        let lName = emailCheck.lastName
+        let userId = emailCheck._id
+        const token = jwt.sign(
+            {
+                userId: userId
+            },
+            process.env.SecretKey, { expiresIn: "24hr" }
+        );
+           res.setHeader("token",token)
+        return res.status(200).send({ message: ` welcome👽👽 ${fName}  ${lName}` })
+
+    } catch (error) {
+        res.status(500).send({ status: false, message: error.message })
     }
-    let { email, password } = data;
-    if (!valid(email)) {
-      return res
-        .status(400)
-        .send({ status: false, message: "email is required" });
-    }
-    //  email validation
-    // user
-    if (!valid(password)) {
-      return res
-        .status(400)
-        .send({ status: false, message: "password is required" });
-    }
-    password = password.trim();
-    //  password Validation
 
-    const emailCheck = await userModel.findOne({ email: email });
-    if (!emailCheck) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Email not found" });
-    }
+   
 
-    const dbPassword = emailCheck.password;
-
-    const passwordMathched = await bcrypt.compare(password, dbPassword);
-    if (!passwordMathched) {
-      return res
-        .status(401)
-        .send({ status: false, message: "Please provide valid credentils" });
-    }
-
-    let fName = emailCheck.firstName;
-    let lName = emailCheck.lastName;
-    let userId = emailCheck._id;
-    const token = jwt.sign(
-      {
-        userId: userId,
-      },
-      process.env.SecretKey,
-      { expiresIn: "24hr" }
-    );
-
-    return res.status(200).send({ message: ` welcome ${fName}  ${lName}` });
-  } catch (error) {
-    res.status(500).send({ status: false, message: error.message });
-  }
-
-  // credential should be present
-  // verify the correct format of email and password
-  // compate password with bycript
-  // generate token after successful varification
-  // send token in responce
-};
+}
 
 
 //-------------------------------------------------------updateUser-----------------------------------------------------------------------------//
@@ -407,5 +405,116 @@ const getUser = async (req, res) => {
   }
 };
 
+const getRequests = async (req, res) => {
+  try {
+    let user = await userModel.findOne({ _id: req.params.userId })
+    return res.status(200).send({ status: true, count: user.followersRequest.length, message: "Success", data: user.followersRequest })
 
-module.exports = { createUser, loginUser, updateUser, updatePassword, getUser };
+  } catch (error) {
+    return res.status(500).send({ status: false, error: error.message })
+
+  }
+}
+
+///  = Delete API's
+const userDelete = async function (req, res) {
+    try{
+        let userId = req.params.userId   // input user's ID (authentic)
+        // let data = req.body
+        // Authorization here
+         
+        // empty body check
+        // if(!isValidBody(data)) return 'please enter a User Id to delete';
+        console.log('hello idhar aao')
+        if(!isValidBody(userId) || !isValidObjectId(userId))  return res.status(400).send({msg: 'please enter your valid user Id in Params'})
+        // if(!isValidObjectId(data.userId) || isValidBody(data.userId)) return 'please enter a valid user Id'
+
+        // validation & DB call for exist check
+        const existCheck = await userModel.findOneAndUpdate({_id: userId, isDeleted:false}, {isDeleted:true, deletedAt: Date.now()}, {new: true})
+
+        // if does not exist
+        if(!existCheck) return res.status(404).send({msg: 'user does not exists'})
+        // giving response
+        res.status(204).send({status: true, message: 'User Deleted Successfully', data: existCheck})
+    }
+
+    catch(err){
+        res.status(500).send({status: false, message: 'err.Message'})
+    }   
+
+}
+
+// Follower Api's
+const following = async function (req, res) {
+    try{
+        let userId = req.params.userId
+        let data = req.body
+        //  Validation and empty check
+        if(!isValidBody(userId) || !isValidObjectId(userId)) return ' Please!, enter your valid userId in Params'
+        if(!isValidBody(data)) return 'Please!, fill mandatory fields to run this functionality'
+
+        if(!isValidObjectId(data.userId)|| !isValidBody(data.userId)) return 'Please!, enter a valid Object Id of the person whom you want to follow'
+
+        // DB call for Id check( if we're going to update things while checking and in the time of second ID check if we'll not get any result then the First updation will getting false so............)
+        /**
+         * kya function bana ke invocation kiya ja skta h?
+         * kya dono ko hi && operator ke saath if condition me daal ke run kara du  -- but shaayd wo read karne ke saath saath hi update bhi kar dega
+         *  solution by me = ek ka existance check kar lete h, dusre me findoneAndUpdate laga dunga.
+         */
+
+        // const userCheck = await userModel.findOne({_id: userId, isDeleted: false})
+        // if (!userCheck) return 'UserId given in Params does not exists'
+        if(userId==data.userId) return res.status(409).send({status: false, message:" Not Allowed! "})
+
+        const followersReq = await userModel.findOneAndUpdate({_id:data.userId, isDeleted: false},{$addToSet:{followersRequest:userId}}, {new:true})
+        if(!followersReq) return res.status(404).send({status: false, message:"follower profile does't exists"})
+        console.log(followersReq)
+
+        // const userUpdate = await userModel.findOneAndUpdate({_id:userId, isDelted:false}, {$push:{followers:data.userId}}, {new:true})
+
+        res.status(200).send({status:true, message: `you followed ${data.userId}`})
+
+    }
+    catch(err){
+        res.status(500).send({status: false, message:'err.Message'})
+    }
+}
+
+
+const acceptRequest = async (req, res) => {
+  try {
+    let requestId = req.body.userId
+    let user = await userModel.findOne({ _id: req.params.userId })
+
+    let action = req.body.action
+
+    //increase follower count
+    for (let i = 0; i < user.followersRequest.length; i++) {
+      if (requestId == user.followersRequest[i] && action==1) {
+        await userModel.findOneAndUpdate({ _id: req.params.userId }, {$pull: { followersRequest:user.followersRequest[i] },  $inc: { totalFollower: 1 }, $addToSet:{followers:user.followersRequest[i]} });
+
+        await userModel.findOneAndUpdate({ _id: requestId }, { $inc: { totalFollowing: 1 } , $addToSet:{following:req.params.userId}})
+
+        return res.status(200).send({ status: true, message: `${requestId} started following you` })
+      }
+
+      if(requestId == user.followersRequest[i] && action==0){
+        await userModel.findOneAndUpdate({ _id: req.params.userId }, {$pull: { followersRequest:user.followersRequest[i] }});
+        return res.status(400).send({ status: false, message: `${requestId} has rejected` })
+      }
+    }
+
+    //increase following count
+    // const incFollowing = await userModel.findOneAndUpdate({ _id: requestId }, { $inc: { totalFollowing: 1 } , $addToSet:{following:req.params.userId}})
+
+    res.status(400).send({ status: false, message: `${requestId} has not requested to follow you. Enter correct userId, Idiot` })
+
+
+
+  } catch (error) {
+    return res.status(500).send({ status: false, error: error.message })
+  }
+}
+
+
+module.exports = { createUser, loginUser, updateUser, updatePassword, getUser, getRequests, acceptRequest, userDelete, following };

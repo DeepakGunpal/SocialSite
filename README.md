@@ -31,7 +31,7 @@ It contains 5 APIs
 POST /register and aws => deepak //plz add location, interests, recommendedcount, school, college, workplace, status
   auto suggest available username
   follower request - accept request
-  get follower request api 
+  get follower request api
 POST /login and auth => sunandini soni
 validation => ankit
 post/follow => rubi
@@ -43,13 +43,15 @@ PUT /user/:userId/profile (Authentication and Authorization required) => sweta d
 Put /user
 delete/user/:userId/profile (Authentication and Authorization required) => Ankit
 ```
+
 update
+
 <!-- hit=following count++,follower count++ -->
+
 user--
 
 follow api
 accept/reject api
-
 
 Post Schema--rubi
 
@@ -61,7 +63,6 @@ location
 like--default 0
 commentCount-
 comment-[]
-
 
 api---
 createPost---rubi

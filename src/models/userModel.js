@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
     firstName: { type: String, required: true, trim: true },
-    lastName: { type: String, required: true, trim: true },
+    lastName: { type: String, trim: true },
     userName: { type: String, required: true, unique: true, trim: true },
     Location: {type: String, trim: true},
     gender: { type: String, trim: true, enum: ["Male", "Female", "LGBTQ", "Prefer not to say"] },//drop down list
@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema({
     Interest: { type: Array, trim: true },
     DOB: { type: String, trim: true },
     college: { type: String, trim: true },
-    noOfFollower: { type: Number, default: 0 },
+    totalFollower: { type: Number, default: 0 },
+    totalFollowing: { type: Number, default: 0 },
     followers: { type: Array, default: [] },
     followersRequest: { type: Array, default: [] },
     following: { type: Array, default: [] },
