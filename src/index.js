@@ -24,7 +24,6 @@ app.all('*', function (req, res) {
     throw new Error("Bad Request");
 });
 
-
 app.use(function (e, req, res, next) {
     if (e.message === "You Hit Wrong Api!!!, Plz Check !!!") {
         res.status(400).send({ status: false, error: e.message });
