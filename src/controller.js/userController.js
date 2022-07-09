@@ -306,12 +306,14 @@ const updatePassword = async function (req, res) {
       .status(400)
       .send({ status: false, message: "plz enter old and new password" });
   }
+
   let { oldPassword, newPassword } = data;
   if (!oldPassword) {
     return res
       .status(400)
       .send({ status: false, message: "Old Password is required" });
   }
+
   if (!newPassword) {
     return res
       .status(400)
@@ -343,7 +345,6 @@ const updatePassword = async function (req, res) {
     .status(200)
     .send({ status: true, message: "Password Updated Succefully" });
 };
-
 
 //------------------------------------------------------get User --------------------------------------------------------------------------//
 
