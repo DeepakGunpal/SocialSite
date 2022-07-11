@@ -1,4 +1,5 @@
 require("dotenv").config();
+const postModel = require("../models/postModel");
 const userModel = require("../models/userModel");
 const { uploadFile } = require("../utility/aws");
 const {  isValidBody } = require("../utility/validation");
@@ -15,11 +16,11 @@ const createPost = async (req, res) => {
         return res.status(400).send({ status: false, message: "post details required" })
     }
 
-    if (!isValidBody(data.post)) {
-        return res.status(400).send({status: false,message: 'post is required'});
-    }
+    // if (!isValidBody(data.post)) {
+    //     return res.status(400).send({status: false,message: 'post is required'});
+    // }
 
-    const user = await userModel.findById({ _id: usertId })
+    const user = await userModel.findById({ _id: data.userId })
     if (!user) {
         return res.status(404).send({ status: false, message: "userId does not exist" })
     }
@@ -33,7 +34,7 @@ const createPost = async (req, res) => {
     let files = req.files;
     if (files && files.length > 0) {
       let uploadPostImage = await uploadFile(files[0]); 
-      post = uploadPostImage;
+      data.post = uploadPostImage;
     } else {
       return res
         .status(400)
