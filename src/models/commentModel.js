@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Objectid = mongoose.Schema.Types.ObjectId;
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const commentSchema = new mongoose.Schema({
     comment: {type: String, required: true, trim: true},
