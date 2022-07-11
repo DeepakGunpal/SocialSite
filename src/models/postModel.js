@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Objectid = mongoose.Schema.Types.ObjectId;
 
 const postSchema = new mongoose.Schema({
     post: { type :  String, required : true, trim: true}, //photo
