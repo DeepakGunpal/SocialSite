@@ -1,5 +1,5 @@
-const aws = require("aws-sdk");
-const { validFileRegex } = require("../utility/validation");
+import aws from "aws-sdk";
+import { validFileRegex } from "../utility/validation.js";
 
 //-------------------aws-----------------------------------------
 
@@ -36,4 +36,4 @@ let uploadFile = (file) => {
     });
 };
 
-module.exports = { uploadFile };
+export { uploadFile };

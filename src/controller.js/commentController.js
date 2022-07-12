@@ -1,5 +1,5 @@
-const commentModel = require('../models/commentModel')
-const {isValidBody} = require('../utility/validation')
+import commentModel from '../models/commentModel.js';
+import {isValidBody} from '../utility/validation.js';
 
 
 
@@ -30,3 +30,5 @@ const createComment = function(req, res){
         res.status(500).send({status: false, message: err.message})
     }
 }
+
+export {createComment}

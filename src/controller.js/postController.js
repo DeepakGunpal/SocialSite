@@ -1,8 +1,8 @@
-require("dotenv").config();
-const postModel = require("../models/postModel");
-const userModel = require("../models/userModel");
-const { uploadFile } = require("../utility/aws");
-const {  isValidBody } = require("../utility/validation");
+// require("dotenv").config();
+import postModel from "../models/postModel.js";
+import userModel from "../models/userModel.js";
+import { uploadFile } from "../utility/aws.js";
+import {  isValidBody } from "../utility/validation.js";
 
 
 
@@ -49,4 +49,4 @@ const createPost = async (req, res) => {
   }
 }
 
-module.exports = { createPost }
+export { createPost }
