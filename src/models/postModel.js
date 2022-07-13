@@ -1,9 +1,8 @@
-const mongoose = require('mongoose');
-const ObjectId=mongoose.Schema.Types.ObjectId
-
+import mongoose from 'mongoose';
+const Objectid = mongoose.Schema.Types.ObjectId;
 
 const postSchema = new mongoose.Schema({
-    post: { type :  String, required : true, trim: true}, //photo
+    post: { type :  String}, //photo
     caption : { type: String, trim: true}, 
     userId: {type : ObjectId, ref : 'user', required : true },
     //tags:[{ type: String, trim: true}], //if user want to tag someone in the pic...   confusion
@@ -18,4 +17,4 @@ const postSchema = new mongoose.Schema({
 
 }, { timestamps: true })
 
-module.exports = mongoose.model('post', postSchema)
+export default mongoose.model('post', postSchema)

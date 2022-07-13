@@ -1,8 +1,8 @@
-const express = require('express');
+import  express  from "express";
 const router = express.Router();
-const { updatePost,getPost } = require('../controller.js/postController');
-const { createUser, loginUser, getUser, updateUser, updatePassword, getRequests, acceptRequest, userDelete, following } = require('../controller.js/userController')
 
+import { createUser, loginUser, getUser, updateUser,getPost, updatePassword, getRequests, acceptRequest,userDelete, following}  from '../controller.js/userController.js';
+import {createPost} from '../controller.js/postController.js';
 
 //----------------------------------------------------FEATURE-1_USER API'S----------------------------------------------------------------------------------------//
 router.post("/register", createUser)
@@ -16,7 +16,9 @@ router.delete('/deleteUser/:userId', userDelete)  // for delete user
 router.put('/following/:userId', following)   // fpr update follower and following
 
 //----------------------------------------------------FEATURE-2_POST API'S----------------------------------------------------------------------------------------//
-router.put("/editPost", updatePost)
 router.get("/getPost/:userId",getPost)
+router.post("/user/:userId/feed",createPost)
+router.put("/editPost",)
 
-module.exports = router;
+
+export default router;
