@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { updatePost } = require('../controller.js/postController');
+const { updatePost,getPost } = require('../controller.js/postController');
 const { createUser, loginUser, getUser, updateUser, updatePassword, getRequests, acceptRequest, userDelete, following } = require('../controller.js/userController')
 
 
@@ -17,5 +17,6 @@ router.put('/following/:userId', following)   // fpr update follower and followi
 
 //----------------------------------------------------FEATURE-2_POST API'S----------------------------------------------------------------------------------------//
 router.put("/editPost", updatePost)
+router.get("/getPost/:userId",getPost)
 
 module.exports = router;

@@ -364,7 +364,7 @@ const getUser = async (req, res) => {
 
     // if (!(userId == tokenId)) {
     //     return res.status(401).send({ status: false, message: "Unauthorized User" })
-    // }
+    // 
 
     let { Name, firstName, Institute, place, email } = filterQuery;
 

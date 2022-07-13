@@ -1,4 +1,3 @@
-// require('dotenv').config({path: '..env'});
 
 require('dotenv').config();
 
@@ -7,6 +6,7 @@ const app = express();
 const mongoose = require('mongoose');
 const route = require('./route/route');
 const multer = require("multer");
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
