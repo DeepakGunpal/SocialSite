@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-const Objectid = mongoose.Schema.Types.ObjectId;
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const postSchema = new mongoose.Schema({
     post: { type :  String}, //photo
