@@ -115,7 +115,7 @@ const getPost = async (req, res) => {
     }
 }
 
-
+//------------------------------------------------------------likePost api---------------------------------------------------------------------------------//
 
 const likePost = async (req, res) => {
     try {
@@ -196,5 +196,47 @@ const likePost = async (req, res) => {
     }
 }
 
+//--------------------------------------------------------delete Post API--------------------------------------------------------------------------------------------//
 
-export { createPost, getPost, likePost }
+const deletePosts = async (req, res) => {
+
+    try {
+           const postId = req.params.postId
+           const userId = req.params.userId
+   
+           if (!isValidBody(postId) ||!isValidObjectId(postId)) {
+               return res.status(400).send({ status: false, message: "please enter valid post Id" })
+           }
+           if (!isValidBody(userId) ||!isValidObjectId(userId)) {
+               return res.status(400).send({ status: false, message: "please enter valid user Id" })
+           }
+           const post = await postModel.findOne({ _id: postId, userId: userId })
+           if (!post) {
+               return res.status(404).send({ status: false, message: "Not posted yet anything" })
+           }
+           if (post.isDeleted == true) {
+               return res.status(404).send({ status: false, message: "This post has been deleted already or could'nt found" })
+           }
+   
+           const user = await userModel.findById(userId)
+           if (!user) {
+               return res.status(404).send({ status: false, message: "No user Exists with this userId" })
+           }
+           if (user.isDeleted == true) {
+               return res.status(404).send({ status: false, message: "could'nt find this user or has been already deleted" })
+           }
+   
+          await postModel.findOneAndUpdate({ _id: postId }, { $set: { isDeleted: true }, deletedAt: Date.now() }, { new: true })
+          await postModel.findByIdAndUpdate({ _id: postId }, { $inc: { reviews: -1 } }, { new: true })
+       
+           return res.status(200).send({ status: true, message: "This post has been deleted successfully" })
+    }
+   
+       catch (error) {
+           console.log(error.message)
+           return res.status(500).send({ status: "error", msg: error.message })
+       }
+   }
+   
+
+export { createPost, getPost, likePost, deletePosts }
