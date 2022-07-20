@@ -1,9 +1,9 @@
-require("dotenv").config();
-const userModel = require("../models/userModel");
-const bcrypt = require("bcrypt");
-const { uploadFile } = require("../utility/aws");
-const { SuggestUserName, isValidObjectId, isValidPass, isValidBody, enumGender, isValidEmail, isValidPhone } = require("../utility/validation");
-const jwt = require("jsonwebtoken")
+// require("dotenv").config();
+import userModel from "../models/userModel.js";
+import bcrypt from "bcrypt";
+import { uploadFile } from "../utility/aws.js";
+import { SuggestUserName, isValidObjectId, isValidPass, isValidBody, enumGender, isValidEmail, isValidPhone } from "../utility/validation.js";
+import jwt from "jsonwebtoken";
 
 let user = async (data) => {
   let check = await userModel.findOne(data)
@@ -151,7 +151,7 @@ const createUser = async (req, res) => {
       //upload to s3 and get the uploaded link
       // res.send the link back to frontend/postman
       let uploadProfileImage = await uploadFile(files[0]); //upload file
-      profileImage = uploadProfileImage;
+      data.profileImage = uploadProfileImage;
     } else {
       return res
         .status(400)
@@ -306,12 +306,14 @@ const updatePassword = async function (req, res) {
       .status(400)
       .send({ status: false, message: "plz enter old and new password" });
   }
+
   let { oldPassword, newPassword } = data;
   if (!oldPassword) {
     return res
       .status(400)
       .send({ status: false, message: "Old Password is required" });
   }
+
   if (!newPassword) {
     return res
       .status(400)
@@ -344,7 +346,6 @@ const updatePassword = async function (req, res) {
     .send({ status: true, message: "Password Updated Succefully" });
 };
 
-
 //------------------------------------------------------get User --------------------------------------------------------------------------//
 
 const getUser = async (req, res) => {
@@ -364,7 +365,7 @@ const getUser = async (req, res) => {
 
     // if (!(userId == tokenId)) {
     //     return res.status(401).send({ status: false, message: "Unauthorized User" })
-    // }
+    // 
 
     let { Name, firstName, Institute, place, email } = filterQuery;
 
@@ -517,4 +518,4 @@ const acceptRequest = async (req, res) => {
 }
 
 
-module.exports = { createUser, loginUser, updateUser, updatePassword, getUser, getRequests, acceptRequest, userDelete, following };
+export  { createUser, loginUser, updateUser, updatePassword, getUser, getRequests, acceptRequest, userDelete, following };

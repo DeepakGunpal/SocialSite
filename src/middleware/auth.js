@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
 const authToken = (token) => {
     let tokenValidate = jwt.verify(token, "rtyrufycdtr3343##$", (err, data) => {
@@ -40,4 +40,4 @@ const auth = async function (req, res, next) {
     }
 }
 
-module.exports = { auth }
+export { auth }

@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const commentSchema = new mongoose.Schema({
     comment: {type: String, required: true, trim: true},
@@ -13,4 +14,4 @@ const commentSchema = new mongoose.Schema({
 }, {timestamps: true})
 
 
-module.exports = mongoose.model('comment', commentSchema)
+export default mongoose.model('comment', commentSchema)

@@ -1,5 +1,5 @@
-const userModel = require('../models/userModel')
-const mongoose = require('mongoose')  //use for object ID validation
+import userModel from "../models/userModel.js";
+import mongoose from 'mongoose';  //use for object ID validation
 
 
 //suggest available username
@@ -58,4 +58,4 @@ const isValidPass = function (password) {
 
 
 
-module.exports = { validFileRegex, SuggestUserName, isValidBody, isValidPhone, isValidEmail, isValidObjectId, isValidPass, enumGender }
+export { validFileRegex, SuggestUserName, isValidBody, isValidPhone, isValidEmail, isValidObjectId, isValidPass, enumGender }

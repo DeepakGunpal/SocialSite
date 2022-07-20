@@ -69,8 +69,13 @@ createPost---rubi
 get post---sunandini
 update post-- Deepak
 delete post--Swati
+like Api
 
 
 comment schema
 ref: post, user
-schema: body, image/gif, date,
+schema: body, image/gif, date , deletedAt,isdeleted
+createComment (path contain userId,postId) : Ankit
+getComment  (path param contail postId ,commentId(query))  : Sweta Di
+updateComment  (patch)path param contail userId,commentId) : Mitesh
+deleteComment path param contail userId,commentId) : Mitesh
