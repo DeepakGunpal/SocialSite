@@ -30,3 +30,5 @@ const createComment = function(req, res){
         res.status(500).send({status: false, message: err.message})
     }
 }
+
+molude.exports = {createComment}
