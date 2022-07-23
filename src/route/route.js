@@ -24,5 +24,6 @@ router.delete("/delete/:userId/:postId",deletePosts)
 
 //----------------------------------------------------FEATURE-3_POST API'S----------------------------------------------------------------------------------------//
 router.get("/getComment/:userId/post/:postId", getComment)
+router.post('/createComment/userId/postId', createComment)
 
 export default router;
