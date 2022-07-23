@@ -3,6 +3,7 @@ const router = express.Router();
 
 import { createUser, loginUser, getUser, updateUser, updatePassword, getRequests, acceptRequest,userDelete, following}  from '../controller.js/userController.js';
 import {createPost,getPost, likePost, deletePosts} from '../controller.js/postController.js';
+import {getComment} from '../controller.js/commentController.js'
 
 //----------------------------------------------------FEATURE-1_USER API'S----------------------------------------------------------------------------------------//
 router.post("/register", createUser)
@@ -21,6 +22,7 @@ router.post("/user/:userId/feed",createPost)
 router.patch("/likePost/:userId",likePost)
 router.delete("/delete/:userId/:postId",deletePosts)
 
-
+//----------------------------------------------------FEATURE-3_POST API'S----------------------------------------------------------------------------------------//
+router.get("/getComment/:userId/post/:postId", getComment)
 
 export default router;
