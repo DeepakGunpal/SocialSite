@@ -1,5 +1,7 @@
 import commentModel from '../models/commentModel.js';
-import {isValidBody} from '../utility/validation.js';
+import postModel from '../models/postModel'
+import userModel from '../models/userModel'
+import {isValidBody, isValidObjectId} from '../utility/validation.js';
 import { uploadFile } from "../utility/aws";
 
 
@@ -10,14 +12,21 @@ const createComment = async function(req, res){
         let postId = req.params.postId;
         let data = req.body;
         let files = req.files;
-        let{commnet} = data
+        let{comment} = data
 
         // check the body has data
-        if(!isValidBody(data)) return res.status(400).send({status: false, message:'Please fill mandatory fields.'})
+        if(!isValidBody(comment)) return res.status(400).send({status: false, message:'Please fill mandatory fields.'})
+        // Check ID's
+        if (!isValidBody(userId)|| isValidObjectId(userId)) {
+            res.status(400).send({status: false, message:"Please! enter a valid user Id"})
+        }
+        if (!isValidBody(postId)|| isValidObjectId(postId)) {
+            res.status(400).send({status: false, message:"Please! enter a valid post Id"})
+        }
 
         // Db call for check user Id and Post Id
-        const userCheck = await findOne({_id: userId, idDeleted: false})
-        const postCheck = await findOne({_id: postId, idDeleted: false})
+        const userCheck = await userModel.findOne({_id: userId, idDeleted: false})
+        const postCheck = await postModel.findOne({_id: postId, idDeleted: false})
         if(!userCheck) return res.status(404).send({status: false, msg:'UserId given in params does not exists.'})
         if(!postCheck) return res.status(404).send({status: false, msg:'Post ID given in params does not exists.'})
 

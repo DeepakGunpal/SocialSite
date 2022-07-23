@@ -22,6 +22,6 @@ router.patch("/likePost/:userId",likePost)
 router.delete("/delete/:userId/:postId",deletePosts)
 
 // --------------------------- Comment API ------------------
-router.post('/createComment/userId/postId', createComment)
+router.post('/createComment/:userId/:postId', createComment)
 
 export default router;
