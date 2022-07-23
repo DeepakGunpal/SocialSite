@@ -1,8 +1,8 @@
 import commentModel from '../models/commentModel.js';
-import postModel from '../models/postModel'
-import userModel from '../models/userModel'
+import postModel from '../models/postModel.js'
+import userModel from '../models/userModel.js'
 import {isValidBody, isValidObjectId} from '../utility/validation.js';
-import { uploadFile } from "../utility/aws";
+import { uploadFile } from "../utility/aws.js";
 
 
 
@@ -17,11 +17,11 @@ const createComment = async function(req, res){
         // check the body has data
         if(!isValidBody(comment)) return res.status(400).send({status: false, message:'Please fill mandatory fields.'})
         // Check ID's
-        if (!isValidBody(userId)|| isValidObjectId(userId)) {
-            res.status(400).send({status: false, message:"Please! enter a valid user Id"})
+        if (!isValidBody(userId)|| !isValidObjectId(userId)) {
+            return res.status(400).send({status: false, message:"Please! enter a valid user Id"})
         }
-        if (!isValidBody(postId)|| isValidObjectId(postId)) {
-            res.status(400).send({status: false, message:"Please! enter a valid post Id"})
+        if (!isValidBody(postId)|| !isValidObjectId(postId)) {
+            return res.status(400).send({status: false, message:"Please! enter a valid post Id"})
         }
 
         // Db call for check user Id and Post Id
@@ -32,10 +32,12 @@ const createComment = async function(req, res){
 
         if (files && files.length > 0) {
             let uploadPostImage = await uploadFile(files[0]);
-            data.post = uploadPostImage;
-        } else {
-            return res.status(400).send({ status: false, message: "Please upload image" });
+            data['imageFile'] = uploadPostImage
         }
+
+        data['postId'] = postId;
+        data['userId'] = userId;
+        console.log(data)
 
         const newCommnet = await commentModel.create(data)
         res.status(201).send({status: true, msg:'commented on Post', data: newCommnet})
@@ -46,4 +48,4 @@ const createComment = async function(req, res){
     }
 }
 
-molude.exports = {createComment}
+export {createComment}
