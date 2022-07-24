@@ -8,7 +8,8 @@ const commentSchema = new mongoose.Schema({
     isLiked: {type: Boolean, defauld: false, trim: true},
     liked: {type: Array, trim: true},
     isDeleted: {type: Boolean, default: false, trim: true},
-    deletedAt: {type:Date, default: null}
+    deletedAt: {type:Date, default: null},
+    imageFile: {type: String}
 
 
 }, {timestamps: true})
