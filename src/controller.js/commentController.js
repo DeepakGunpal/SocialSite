@@ -254,186 +254,100 @@ const deleteComment = async function (req, res) {
   }
 };
 
-export { createComment, getComment, deleteComment, updatedcomment };
+const likeComment= async (req,res)=>{
+try {
+  let data = req.body
+        let userId = req.params.user
+        let postId= req.params.post
+        let { commentId, action } = data
 
-// const updateProduct = async function (req, res) {
-//     try {
-//       let productId = req.params.productId;
+        // check userid
+        if (!isValidObjectId(userId)) {
+            return res.status(400).send({ status: false, message: " userId is not correct" })
+        }
 
-//       if (!Validator.isValidObjectId(productId)) {
-//         return res
-//           .status(400)
-//           .send({ status: false, message: " Enter a valid productId" });
-//       }
+        const userCheck = await userModel.findOne({ userId: userId, isDeleted: false, isDeactivated: false })
+        if (!userCheck) {
+            return res.status(400).send({ status: false, message: `${userId} not exist` })
+        }
 
-//       const productByproductId = await productModel.findOne({
-//         _id: productId,
-//         isDeleted: false,
-//       });
+        // check postId
+       
+        if (!isValidObjectId(postId)) {
+            return res.status(400).send({ status: false, message: " invalid PostId ಥ_ಥ" })
+        }
+        const checkPostId = await postModel.findOne({ _id: postId, isDeleted: false })
+        
+        if (!checkPostId) {
+            return res.status(400).send({ status: false, message: `post ${postId} is not present` })
+        }
+        if (!commentId) {
+          return res.status(400).send({ status: false, message: "plz provide commentId" })
+       }
 
-//       if (!productByproductId) {
-//         return res
-//           .status(404)
-//           .send({ status: false, message: " Product not found" });
-//       }
-//       let data = req.body;
-//       let {
-//         title,
-//         price,
-//         currencyId,
-//         currencyFormat,
-//         availableSizes,
-//         productImage,
-//       } = data;
+        if (!isValidObjectId(commentId)) {
+          return res.status(400).send({ status: false, message: " invalid commentId ಥ_ಥ" })
+        }
+        const checkComment = await commentModel.findOne({ postId: postId,_id:commentId ,isDeleted: false })
+      
+        if(!checkComment){
+          return res.status(400).send({ status: false, message: ` comment ${commentId} is not present`})
+        }
 
-//       let files = req.files;
 
-//       if (files && files.length > 0) {
-//         if (!Validator.isValidImageType(files[0].mimetype)) {
-//           return res.status(400).send({
-//             status: false,
-//             message: "Only images can be uploaded (jpeg/jpg/png)",
-//           });
-//         }
-//         let fileUrl = await uploadFile(files[0]);
-//         productImage = fileUrl;
-//       }
 
-//       if (title) {
-//         let uniqueTitle = await productModel
-//           .findOne({ title: title })
-//           .collation({ locale: "en", strength: 2 });
-//         if (uniqueTitle) {
-//           return res.status(400).send({
-//             status: false,
-//             message: "Title already present",
-//           });
-//         }
-//       }
+        // check event it can only like,dislike
+        if (!action) {
+            return res.status(400).send({ status: false, message: "provide action like or dislike " })
+        }
+        action = action.toString().trim().toLowerCase()
+        if (!["like", "dislike"].includes(action)) {
+            res.status(400).send({ status: false, message: "action can only be like  or dislike" })
+        }
 
-//       if (price) {
-//         if (!Validator.isValidPrice(price)) {
-//           return res.status(400).send({
-//             status: false,
-//             message:
-//               "Price should be minimum 3-5 digits and for decimal value- after decimal please take 2 digits",
-//           });
-//         }
-//       }
-//       if (currencyId) {
-//         if (currencyId != "INR") {
-//           return res.status(400).send({
-//             status: false,
-//             message: "CurrencyId should be INR",
-//           });
-//         }
-//       }
+        //  check the presence of userId in likes
 
-//       if (currencyFormat) {
-//         if (currencyFormat != "₹") {
-//           return res.status(400).send({
-//             status: false,
-//             message: "CurrencyFormat should be ₹ ",
-//           });
-//         }
-//       }
+        let liked = checkComment["likedBy"].includes(userId)
 
-//       if (availableSizes) {
-//         let enumSize = ["S", "XS", "M", "X", "L", "XXL", "XL"];
-//         for (let i = 0; i < availableSizes.length; i++) {
-//           if (!enumSize.includes(availableSizes[i])) {
-//             return res.status(400).send({
-//               status: false,
-//               message: "availableSizes should be-[S, XS,M,X, L,XXL, XL]",
-//             });
-//           }
-//         }
-//       }
+        // *conditions---if like && !liked---push userId likes++
+        if (action == "like" && !liked) {
+            await commentModel.findByIdAndUpdate(commentId,
+                {
+                    $addToSet: { likedBy: userId },
+                    $inc: { likes: 1 }
+                },
+                { new: true })
 
-//       let updatedData = await productModel.findOneAndUpdate(
-//         { _id: productId },
-//         data,
-//         {
-//           new: true,
-//         }
-//       );
-//       return res.status(200).send({
-//         status: true,
-//         message: "product details updated",
-//         data: updatedData,
-//       });
-//     } catch (err) {
-//       return res.status(500).send({ status: false, error: err.message });
-//     }
-//   };
+            res.status(200).send({ status: true, message: "succesfully ❤ the post (★‿★)" })
+        }
 
-// const updateReview = async function (req, res) {
-//     try {
-//       const { bookId, reviewId } = req.params;
-//       if (!ObjectId.isValid(bookId)) {
-//         return res
-//           .status(400)
-//           .send({ status: false, message: "Please enter valid bookId" });
-//       }
-//       if (!ObjectId.isValid(reviewId)) {
-//         return res
-//           .status(400)
-//           .send({ status: false, message: "Please enter valid reviewId" });
-//       }
+        // 2] if likes&& liked --res already like want to unlike this post
+        if (action == "like" && liked) {
+            res.status(400).send({ status: false, message: "you have already liked the comment ¯\_(ツ)_/¯" })
+        }
+        // 3]if unlike&& !liked res--do you want to like the post
+        if (action == "dislike" && !liked) {
+            res.status(400).send({ status: false, message: " do you want to like ❤ this comment" })
+        }
+        // 4] if unlike&& liked pop (userId) like--
+        if (action == "dislike" && liked) {
+            await commentModel.findByIdAndUpdate(commentId,
+                {
+                    $pull: { likedBy: userId },
+                    $inc: { likes: -1 }
+                },
+                { new: true })
+                
+            res.status(200).send({ status: true, message: "♨_♨  disliked the comment 🖤" })
+        }
+       
+} catch (error) {
+  return res.status(500).send({ status: false, message: err.message });
+  
+}
+}
 
-//       let body = req.body;
-//       const { rating } = body;
 
-//       const validBook = await bookModel
-//         .findOne({ _id: bookId, isDeleted: false })
-//         .select({ deletedAt: 0 });
+export { createComment, getComment, deleteComment, updatedcomment ,likeComment};
 
-//       if (!validBook) {
-//         return res.status(404).send({ status: false, message: "No book found" });
-//       }
 
-//       const validReviewId = await reviewModel.findOne({
-//         _id: reviewId,
-//         isDeleted: false,
-//       });
-
-//       if (!validReviewId) {
-//         return res
-//           .status(404)
-//           .send({ status: false, message: "Review does not exist" });
-//       }
-
-//       if (bookId != validReviewId.bookId) {
-//         return res
-//           .status(400)
-//           .send({ status: false, message: "This review is not for this book" });
-//       }
-//       if (!isValidRequestBody(body)) {
-//         return res
-//           .status(400)
-//           .send({
-//             status: false,
-//             message: "Please provide data to update review",
-//           });
-//       }
-//       if (!/(^[1-5]{1}\.[1-5]|^[1-5]{1}$)/.test(rating)) {
-//         return res
-//           .status(400)
-//           .send({ status: false, message: "Rate between 1-5" });
-//       }
-//       body.reviewedAt = new Date();
-//       let updatedReview = await reviewModel.findByIdAndUpdate(reviewId, body, {
-//         new: true,
-//       });
-//       let getReviewsData = await reviewModel.find({
-//         bookId: bookId,
-//         isDeleted: false,
-//       });
-//       Object.assign(validBook._doc, { reviewsData: [getReviewsData] });
-//       return res
-//         .status(200)
-//         .send({ status: true, message: "Review Updated", data: validBook });
-//     } catch (err) {
-//       return res.status(500).send({ status: false, message: err.message });
-//     }
-//   };
