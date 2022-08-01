@@ -16,6 +16,12 @@ let SuggestUserName = async (inputUserName) => {
 
 const validFileRegex = /^.+\.(?:(?:[dD][oO][cC][xX]?)|(?:[pP][dD][fF])|(?:[pP][nN][gG])|(?:[jJ][pP][gG]))$/
 
+
+const isValidImageType = function (data) {
+    const reg = /^.+\.(?:(?:[dD][oO][cC][xX]?)|(?:[pP][dD][fF])|(?:[pP][nN][gG])|(?:[jJ][pP][gG]))$/
+    return reg.test(data)
+  }
+
 const enumGender = (gender) => {
     if (!["Male", "Female", "LGBTQ", "Prefer not to say"].includes(gender)) {
         return false;
@@ -58,4 +64,4 @@ const isValidPass = function (password) {
 
 
 
-export { validFileRegex, SuggestUserName, isValidBody, isValidPhone, isValidEmail, isValidObjectId, isValidPass, enumGender }
+export { validFileRegex,isValidImageType, SuggestUserName, isValidBody, isValidPhone, isValidEmail, isValidObjectId, isValidPass, enumGender }

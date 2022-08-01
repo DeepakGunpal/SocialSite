@@ -76,6 +76,6 @@ comment schema
 ref: post, user
 schema: body, image/gif, date , deletedAt,isdeleted
 createComment (path contain userId,postId) : Ankit
-getComment  (path param contail postId ,commentId(query))  : Sweta Di
-updateComment  (patch)path param contail userId,commentId) : Mitesh
-deleteComment path param contail userId,commentId) : Mitesh
+getComment  (path param contain postId ,commentId(query))  : Sweta Di
+updateComment  (patch)path param contain userId,commentId) : Mitesh
+deleteComment path param contain userId,commentId) : Mitesh
