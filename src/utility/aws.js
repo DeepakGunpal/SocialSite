@@ -26,7 +26,7 @@ let uploadFile = (file) => {
                 return reject({ error: err.message });
             }
             if (!validFileRegex.test(file.originalname)) {
-                return reject({ status: false, message: "Invalid file type - accepted file type are - png, jpg, doc, pdf" })
+                return reject({ status: false, message: "Invalid file" })
             }
 
             console.log("file uploaded succesfully");

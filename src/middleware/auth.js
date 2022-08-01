@@ -25,7 +25,7 @@ const auth = async function (req, res, next) {
 
         let decodedToken = authToken(bearerToken)
         if (!decodedToken) {
-            return res.status(401).send({ status: false, message: "" })
+            return res.status(401).send({ status: false, message: "Invalid token" })
         }
         console.log(decodedToken)
         // ask
@@ -34,7 +34,7 @@ const auth = async function (req, res, next) {
         next()
 
     }
-    catch (error){
+    catch (error) {
         return res.status(500).send({ status: "Error", error: error.message })
 
     }

@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import { uploadFile } from "../utility/aws.js";
 import { SuggestUserName, isValidObjectId, isValidPass, isValidBody, enumGender, isValidEmail, isValidPhone } from "../utility/validation.js";
 import jwt from "jsonwebtoken";
+import pkg from "dotenv";
+pkg.config();
 
 let user = async (data) => {
   let check = await userModel.findOne(data)
@@ -150,7 +152,8 @@ const createUser = async (req, res) => {
     if (files && files.length > 0) {
       //upload to s3 and get the uploaded link
       // res.send the link back to frontend/postman
-      let uploadProfileImage = await uploadFile(files[0]); //upload file
+      let uploadProfileImage = await uploadFile(files[0])
+      //upload file
       data.profileImage = uploadProfileImage;
     } else {
       return res
@@ -162,6 +165,9 @@ const createUser = async (req, res) => {
     const user = await userModel.create(data);
     res.status(201).send({ status: true, message: `Registration successfull. login credentials - userName = ${userName} , password = ${actualPass}`, data: user })
   } catch (error) {
+    if (error.message = "Invalid file") {
+      return res.status(400).send({ status: false, message: "Invalid file type - accepted file type are - png, jpg, doc, pdf" })
+    }
     res.status(500).send({ status: false, message: error.message })
   }
 }
@@ -192,7 +198,6 @@ const loginUser = async (req, res) => {
     //  password Validation
 
     const emailCheck = await user({ $or: [{ email: email }, { userName: email }] })
-    console.log(module);
     if (!emailCheck) {
       return res.status(404).send({ status: false, message: `${email} not found` })
     }
@@ -207,6 +212,7 @@ const loginUser = async (req, res) => {
     let fName = emailCheck.firstName
     let lName = emailCheck.lastName
     let userId = emailCheck._id
+    console.log(process.env.SecretKey)
     const token = jwt.sign(
       {
         userId: userId
@@ -518,4 +524,4 @@ const acceptRequest = async (req, res) => {
 }
 
 
-export  { createUser, loginUser, updateUser, updatePassword, getUser, getRequests, acceptRequest, userDelete, following };
+export { createUser, loginUser, updateUser, updatePassword, getUser, getRequests, acceptRequest, userDelete, following };
