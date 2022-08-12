@@ -239,8 +239,8 @@ const updateUser = async (req, res) => {
       .status(400)
       .send({ status: false, message: "Please provide correct userId" });
   }
+
   let userDetail = await isValidUser(userId);
-  console.log(userDetail);
   if (!userDetail) {
     return res
       .status(400)
@@ -257,22 +257,17 @@ const updateUser = async (req, res) => {
 
   if (data["userName"]) {
     //suggest available userName
-    let checkUserName = await userModel.findOne(data.userName);
-    console.log("checkUserName", checkUserName)
+    let checkUserName = await userModel.findOne({ userName: data.userName });
     if (checkUserName) {
-      let availableUserName = await SuggestUserName(userName);
+      let availableUserName = await SuggestUserName(data.userName);
       return res.status(400).send({
         status: false,
-        message: `${userName} not available. This is available ${availableUserName}`,
+        message: `${data.userName} not available. This is available ${availableUserName}`,
       });
     }
-    // const userN = await userNameCheck(data["userName"]);
-    // if (userN) {
-    //   return res
-    //     .status(400)
-    //     .send({ status: false, message: "This User Name is not available. " });
-    // }
+
   }
+
   if (data["email"]) {
     return res
       .status(400)
@@ -294,17 +289,7 @@ const updateUser = async (req, res) => {
 
 const updatePassword = async function (req, res) {
   let userId = req.params.userId;
-  if (!isValidObjectId(userId)) {
-    return res
-      .status(400)
-      .send({ status: false, message: "Please provide correct userId" });
-  }
-  let userDetail = await isValidUser(userId);
-  if (!userDetail) {
-    return res
-      .status(400)
-      .send({ status: false, message: "User does not exist" });
-  }
+
   let data = req.body;
 
   if (!data) {
@@ -349,7 +334,7 @@ const updatePassword = async function (req, res) {
 
   return res
     .status(200)
-    .send({ status: true, message: "Password Updated Succefully" });
+    .send({ status: true, message: "Password Updated Succefully", updated: psdUpdate });
 };
 
 //------------------------------------------------------get User --------------------------------------------------------------------------//
@@ -432,7 +417,6 @@ const userDelete = async function (req, res) {
 
     // empty body check
     // if(!isValidBody(data)) return 'please enter a User Id to delete';
-    console.log('hello idhar aao')
     if (!isValidBody(userId) || !isValidObjectId(userId)) return res.status(400).send({ msg: 'please enter your valid user Id in Params' })
     // if(!isValidObjectId(data.userId) || isValidBody(data.userId)) return 'please enter a valid user Id'
 
