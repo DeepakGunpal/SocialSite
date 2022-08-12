@@ -212,12 +212,12 @@ const loginUser = async (req, res) => {
     let fName = emailCheck.firstName
     let lName = emailCheck.lastName
     let userId = emailCheck._id
-    console.log(process.env.SecretKey)
+    // console.log(process.env.SecretKey)
     const token = jwt.sign(
       {
         userId: userId
       },
-      process.env.SecretKey, { expiresIn: "24hr" }
+      "secretkey", { expiresIn: "24hr" }
     );
     res.setHeader("token", token)
     return res.status(200).send({ message: ` welcome👽👽 ${fName}  ${lName}` })
