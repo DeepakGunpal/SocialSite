@@ -379,11 +379,11 @@ const getUser = async (req, res) => {
     let query = { isDeleted: false }
 
     if (Name) {
-      query['userName'] = { $regex: Name }
+      query['userName'] = { $regex: Name, $option: 'i' }
     }
 
     if (firstName) {
-      query['firstName'] = { $regex: firstName }
+      query['firstName'] = { $regex: firstName, $option: 'i' }
     }
 
     if (Institute) {
