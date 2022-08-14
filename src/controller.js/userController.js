@@ -226,115 +226,109 @@ const loginUser = async (req, res) => {
     res.status(500).send({ status: false, message: error.message })
   }
 
-
-
 }
 
 
 //-------------------------------------------------------updateUser-----------------------------------------------------------------------------//
 const updateUser = async (req, res) => {
-  let userId = req.params.userId;
-  if (!isValidObjectId(userId)) {
-    return res
-      .status(400)
-      .send({ status: false, message: "Please provide correct userId" });
-  }
 
-  let userDetail = await isValidUser(userId);
-  if (!userDetail) {
-    return res
-      .status(400)
-      .send({ status: false, message: "User does not exist" });
-  }
+  try {
+    let userId = req.params.userId;
+    let data = req.body;
+    let files = req.files;
 
-  let data = req.body;
-  let files = req.files;
-
-  if (files && files.length > 0) {
-    const updatedImg = await uploadFile(files[0]);
-    data["profileImage"] = updatedImg;
-  }
-
-  if (data["userName"]) {
-    //suggest available userName
-    let checkUserName = await userModel.findOne({ userName: data.userName });
-    if (checkUserName) {
-      let availableUserName = await SuggestUserName(data.userName);
-      return res.status(400).send({
-        status: false,
-        message: `${data.userName} not available. This is available ${availableUserName}`,
-      });
+    if (files && files.length > 0) {
+      const updatedImg = await uploadFile(files[0]);
+      data["profileImage"] = updatedImg;
     }
 
-  }
+    if (data["userName"]) {
+      //suggest available userName
+      let checkUserName = await userModel.findOne({ userName: data.userName });
+      if (checkUserName) {
+        let availableUserName = await SuggestUserName(data.userName);
+        return res.status(400).send({
+          status: false,
+          message: `${data.userName} not available. This is available ${availableUserName}`,
+        });
+      }
 
-  if (data["email"]) {
-    return res
-      .status(400)
-      .send({ status: false, message: "Email can't be updated" });
-  }
-  if (data["password"]) {
-    return res
-      .status(400)
-      .send({ status: false, message: "Password can't be updated" });
-  }
+    }
 
-  const userUpdate = await userModel.findByIdAndUpdate(userId, data, {
-    new: true,
-  });
-  return res
-    .status(200)
-    .send({ status: true, message: "Updated", data: userUpdate });
+    if (data["email"]) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Email can't be updated" });
+    }
+    if (data["password"]) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Password can't be updated" });
+    }
+
+    const userUpdate = await userModel.findByIdAndUpdate(userId, data, {
+      new: true,
+    });
+    return res
+      .status(200)
+      .send({ status: true, message: "Updated", data: userUpdate });
+  } catch (error) {
+    return res.status(500).send({ status: false, error: error.message })
+  }
 };
 
 const updatePassword = async function (req, res) {
-  let userId = req.params.userId;
 
-  let data = req.body;
+  try {
+    let userId = req.params.userId;
+    let data = req.body;
 
-  if (!data) {
+    if (!data) {
+      return res
+        .status(400)
+        .send({ status: false, message: "plz enter old and new password" });
+    }
+
+    let { oldPassword, newPassword } = data;
+    if (!oldPassword) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Old Password is required" });
+    }
+
+    if (!newPassword) {
+      return res
+        .status(400)
+        .send({ status: false, message: "New Password is required" });
+    }
+
+    const pswd = await isValidUser(userId);
+    const psd = pswd.password
+    const passwordMatched = await bcrypt.compare(oldPassword, psd);
+    if (!passwordMatched) {
+      return res
+        .status(401)
+        .send({ status: false, message: "Please provide valid password" });
+    }
+    if (!isValidPass(newPassword)) {
+      return res
+        .status(400)
+        .send({ status: false, message: "Password length should be 8-15" })
+    }
+    newPassword = await bcrypt.hash(newPassword, 10);
+
+    const psdUpdate = await userModel.findByIdAndUpdate(
+      userId,
+      { password: newPassword },
+      { new: true }
+    );
+
     return res
-      .status(400)
-      .send({ status: false, message: "plz enter old and new password" });
+      .status(200)
+      .send({ status: true, message: "Password Updated Succefully", updated: psdUpdate });
+  } catch (error) {
+    return res.status(500).send({ status: false, error: error.message })
   }
-
-  let { oldPassword, newPassword } = data;
-  if (!oldPassword) {
-    return res
-      .status(400)
-      .send({ status: false, message: "Old Password is required" });
-  }
-
-  if (!newPassword) {
-    return res
-      .status(400)
-      .send({ status: false, message: "New Password is required" });
-  }
-
-  const pswd = await isValidUser(userId);
-  const psd = pswd.password
-  const passwordMatched = await bcrypt.compare(oldPassword, psd);
-  if (!passwordMatched) {
-    return res
-      .status(401)
-      .send({ status: false, message: "Please provide valid password" });
-  }
-  if (!isValidPass(newPassword)) {
-    return res
-      .status(400)
-      .send({ status: false, message: "Password length should be 8-15" })
-  }
-  newPassword = await bcrypt.hash(newPassword, 10);
-
-  const psdUpdate = await userModel.findByIdAndUpdate(
-    userId,
-    { password: newPassword },
-    { new: true }
-  );
-
-  return res
-    .status(200)
-    .send({ status: true, message: "Password Updated Succefully", updated: psdUpdate });
 };
 
 //------------------------------------------------------get User --------------------------------------------------------------------------//
@@ -343,20 +337,6 @@ const getUser = async (req, res) => {
 
   try {
     let filterQuery = req.query;
-    let userId = req.params.userId
-    // let tokenId = req.userId
-
-    if (!isValidBody(userId)) {
-      return res.status(400).send({ status: false, message: "Please Provide User Id" })
-    }
-
-    if (!isValidObjectId(userId)) {
-      return res.status(400).send({ status: false, message: "invalid userId" })
-    }
-
-    // if (!(userId == tokenId)) {
-    //     return res.status(401).send({ status: false, message: "Unauthorized User" })
-    // 
 
     let { Name, firstName, Institute, place, email } = filterQuery;
 
@@ -426,7 +406,7 @@ const userDelete = async function (req, res) {
     // if does not exist
     if (!existCheck) return res.status(404).send({ msg: 'user does not exists' })
     // giving response
-    res.status(204).send({ status: true, message: 'User Deleted Successfully', data: existCheck })
+    res.status(204).send({ status: true, message: 'User Deleted Successfully' })
   }
 
   catch (err) {

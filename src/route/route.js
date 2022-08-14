@@ -9,7 +9,7 @@ import { auth, Authorization } from "../middleware/auth.js";
 //----------------------------------------------------FEATURE-1_USER API'S----------------------------------------------------------------------------------------//
 router.post("/register", createUser)
 router.post("/login", loginUser)
-router.get("/user/:userId/profiles", getUser)
+router.get("/user/:userId/profiles", auth, Authorization, getUser)
 router.put("/updateUser/:userId", auth, Authorization, updateUser)
 router.put("/updatePsd/:userId", auth, Authorization, updatePassword)
 router.get("/getRequests/:userId", auth, Authorization, getRequests)
