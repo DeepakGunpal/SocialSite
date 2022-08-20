@@ -5,12 +5,13 @@
     "TechStack": ["Javascript", "nodejs", "express", "MongoDB", "AWS-S3"],
     "Packages": ["mongoose", "JWT", "bcrypt"],
     "Contributors": [
-      "Deepak Gunpal",
+      "Deepak Gunpal <Explorer>",
       "Sweta Kumari <Sweta Di>",
-      "Sunandini Soni",
+      "Sunandini Soni <Sunandi>",
       "Ankit gupta <Singer>",
-      "Swati pathak",
-      "Rubi chauhan"
+      "Swati pathak <cow>",
+      "Rubi chauhan <hnji>",
+      "mitesh <deepiksha>"
     ]
   }
 ]
